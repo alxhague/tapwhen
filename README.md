@@ -9,6 +9,8 @@ A party-game prototype. Each round names one thing to wait for: a carnivore, a l
 - If the right slide goes by untapped, nobody scores.
 - Ten rounds. Most points wins.
 
+There are 54 reels on six shelves: animals, landmarks, art, space, flags, and names and numbers. Each game draws ten.
+
 ## Running it
 
 `index.html` is the whole game and `img/` holds its slides. There is no build step and nothing to install; the only outside dependency is two Google Fonts. Open `index.html` in a browser, or serve the repo with GitHub Pages.
@@ -27,21 +29,21 @@ Everything below is in the one `<script>` block in `index.html`.
     no:  [['koala', 'Not a bear. Koalas are marsupials.'], 'bison', 'gorilla', 'moose'] }
   ```
 
-  `yes` are the slides that count and `no` the ones that don't. An entry is a slide id, or `[id, 'a line for the result slip']` when there is something worth saying. `yn` and `nn` are the lines used when an entry has none. `pool` is the shelf the reel sits on (`animals`, `landmarks`, `planets`, `flags`, `words`), and `x` marks reels too alike to both turn up in one game.
+  `yes` are the slides that count and `no` the ones that don't. An entry is a slide id, or `[id, 'a line for the result slip']` when there is something worth saying. `yn` and `nn` are the lines used when an entry has none. `pool` is the shelf the reel sits on (`animals`, `landmarks`, `art`, `planets`, `flags`, `words`), and `x` marks reels too alike to both turn up in one game.
 - **Word reels** (`words: true`) flash names or numbers on title slides and need no images. Their entries are the text itself.
 - **Slides** are 900 × 600 WebP files, the 3:2 of a 35mm slide. To add one, put `name.webp` in `img/`, give it a display name in `NAMES`, and list `name` in a reel.
 - **The rules as numbers** are the constants at the top of the script: rounds per game, the 30-second ceiling, the three paces, the quick-draw window, how long a wrong tap freezes the reel, and how many reels each game takes from each shelf (`MIX`).
 - **Colours and fonts** are tokens in the `:root` block at the top of the stylesheet. The finish for each round is `ROUND_PAIRS` in the script.
 
-The EGOT reel was checked in November 2026: 22 winners, Steven Spielberg the most recent.
+Three reels depend on things that change, and were checked in November 2026. EGOT: 22 winners, Steven Spielberg the most recent. The men's World Cup: Spain won in 2026, its second title. The G7: the same seven members at the 2026 summit.
 
 Settings are remembered per device. On a site that also hosts Perfect Timing, Tap When starts in the typeface chosen there.
 
-## Photo credits
+## Picture credits
 
-The photos are openly licensed stand-ins for prototyping, not final art. They keep their own licences, listed here; nothing in this section covers the game's code. Every image has been cropped and resized to 900 × 600. Portrait and panoramic photos sit on a blurred copy of themselves, planets on a plain dark ground, flags on a dark card. The cropped versions are offered under the same licences as their originals.
+The pictures are openly licensed stand-ins for prototyping, not final art. They keep their own licences, listed here; nothing in this section covers the game's code. Every image has been cropped and resized to 900 × 600. Portrait and panoramic photos sit on a blurred copy of themselves, planets and moons on a plain dark ground, flags on a dark card, artworks on a dark wall with a paper mat. The cropped versions are offered under the same licences as their originals.
 
-There are no photos of people. Reels about people use name cards.
+There are no photographs of people. Reels about people use name cards.
 
 **Animals, landmarks and planets** come from the data files of [GCompris](https://gcompris.net) 4.0, the KDE educational suite, as packaged for Ubuntu (`gcompris-qt-data`). GCompris is published under the [GNU GPL, version 3 or later](https://www.gnu.org/licenses/gpl-3.0.html). Its package copyright file records these photos individually:
 
@@ -64,5 +66,9 @@ There are no photos of people. Reels about people use name cards.
 | The Winter Palace | Dezidor | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Zimn%C3%AD_pal%C3%A1c_%283%29.jpg) |
 
 The package gives no individual credit for the remaining photos; they are covered by GCompris's own GPL licence and credited to the GCompris contributors.
+
+**Artworks** (the `art-*` slides) come from the same package: GCompris ships each one cut into jigsaw pieces for its paintings activity, and the slides here are those pieces put back together. The package credits the pictures to WebMuseum, under the GPL, version 3 or later. The works themselves are in the public domain: Hokusai (The Great Wave off Kanagawa, Ejiri in Suruga Province, Kazusa Sea Route, Sunset across Ryōgoku Bridge, Poppies, Oiran and Kamuro, Woman Holding a Fan), Hiroshige (Benzaiten Shrine at Inokashira in Snow, Horse Mackerel and Prawns), Leonardo da Vinci (Mona Lisa), Michelangelo (Pietà), Giovanni Bellini (a detail of the Pesaro Altarpiece), Albrecht Dürer (Lion), Pieter Bruegel the Elder (The Harvesters), Giuseppe Arcimboldo (Spring, The Librarian), Pierre-Auguste Renoir (Bal du moulin de la Galette, Girls at the Piano), Frédéric Bazille (The Ramparts at Aigues-Mortes), Mary Cassatt (Summertime), Vincent van Gogh (Village Street in Auvers) and Wassily Kandinsky (Composition VIII). Titles and attributions follow the package.
+
+**Moons** (the Moon, Io, Europa, Ganymede, Callisto and Titan) are spheres drawn from the surface maps in [OpenUniverse](https://sourceforge.net/projects/openuniverse/) 1.0beta3 by Raúl Alonso, as packaged for Ubuntu (`openuniverse-common`), under the [GNU GPL, version 2 or later](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
 
 **Flags** are from [flag-icons](https://github.com/lipis/flag-icons) 7.2.3 by Panayiotis Lipiridis, under the MIT licence, rendered to WebP.

@@ -455,7 +455,7 @@ p{margin:0}
         <div class="eyebrow">Rounds</div>
         <div class="opts">
           <button class="opt" id="mixAll" type="button"><span class="t">Photos and words</span><span class="d">Eight photo rounds and two of names or numbers.</span></button>
-          <button class="opt" id="mixPhotos" type="button"><span class="t">Photos only</span><span class="d">Animals, landmarks, planets and flags.</span></button>
+          <button class="opt" id="mixPhotos" type="button"><span class="t">Photos only</span><span class="d">Animals, landmarks, art, space and flags.</span></button>
         </div>
       </div>
       <div class="group">
@@ -479,7 +479,7 @@ p{margin:0}
       <div class="group">
         <div class="eyebrow">The reels</div>
         <p class="hint" id="settingsDeckInfo"></p>
-        <button class="pill ghost" id="creditsBtn" type="button">Photo credits</button>
+        <button class="pill ghost" id="creditsBtn" type="button">Picture credits</button>
       </div>
       <button class="pill" type="button" data-close="settings">Done</button>
     </div>
@@ -488,10 +488,11 @@ p{margin:0}
   <div class="overlay" id="credits" hidden>
     <button class="cbtn x" type="button" data-close="credits" aria-label="Close"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none"/></svg></button>
     <div class="col">
-      <h2>Photo credits</h2>
-      <p class="hint">Stand-in photos for the prototype, all openly licensed. Each one has been cropped and resized to fit a slide.</p>
-      <p class="hint">Animal, landmark and planet photos come from GCompris, the KDE educational suite (gcompris.net), which is published under GPL-3.0-or-later. The package records these individual credits:</p>
+      <h2>Picture credits</h2>
+      <p class="hint">Stand-in pictures for the prototype, all openly licensed. Each one has been cropped and resized to fit a slide.</p>
+      <p class="hint">Animal, landmark, planet and artwork pictures come from GCompris, the KDE educational suite (gcompris.net), which is published under GPL-3.0-or-later. The artworks are old enough to be in the public domain; the package credits its pictures of them to WebMuseum. It records these individual credits for photos:</p>
       <ul class="creds" id="credList"></ul>
+      <p class="hint">The six moons are drawn from the surface maps in OpenUniverse (GPL-2.0-or-later).</p>
       <p class="hint">Flags are from flag-icons by Panayiotis Lipiridis (MIT licence).</p>
       <button class="pill" type="button" data-close="credits">Done</button>
     </div>
@@ -524,7 +525,7 @@ p{margin:0}
   const LEAD_STEP_MS = 620;     // each beat of the three, two, one
   const LATE_SHOW_MS = 1200;    // how long "Missed it" holds the screen
   const START_LOCK_MS = 150;
-  const MIX = { all: { animals: 3, landmarks: 3, planets: 1, flags: 1, words: 2 }, photos: { animals: 4, landmarks: 3, planets: 1, flags: 2, words: 0 } };
+  const MIX = { all: { animals: 2, landmarks: 2, art: 1, planets: 1, flags: 2, words: 2 }, photos: { animals: 3, landmarks: 3, art: 1, planets: 1, flags: 2, words: 0 } };
 
   // ───────────── the slides: what each photo is called when the machine names it ─────────────
   const NAMES = {
@@ -549,6 +550,7 @@ p{margin:0}
     opera: 'Sydney Opera House', towerbridge: 'Tower Bridge, London', egeskov: 'Egeskov Castle, Denmark', eilean: 'Eilean Donan Castle, Scotland',
     pisa: 'The Leaning Tower of Pisa', parthenon: 'The Parthenon, Athens', domerock: 'Dome of the Rock, Jerusalem', winter: 'The Winter Palace, St Petersburg',
     mercury: 'Mercury', venus: 'Venus', earth: 'Earth', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune', sun: 'The Sun',
+    moon: 'The Moon', io: 'Io', europa: 'Europa', ganymede: 'Ganymede', callisto: 'Callisto', titan: 'Titan',
     'flag-au': 'Australia', 'flag-nz': 'New Zealand', 'flag-fj': 'Fiji', 'flag-tv': 'Tuvalu', 'flag-us': 'United States', 'flag-lr': 'Liberia', 'flag-my': 'Malaysia',
     'flag-ws': 'Samoa', 'flag-to': 'Tonga', 'flag-no': 'Norway', 'flag-is': 'Iceland', 'flag-dk': 'Denmark', 'flag-gr': 'Greece', 'flag-do': 'Dominican Republic',
     'flag-cu': 'Cuba', 'flag-cl': 'Chile', 'flag-ge': 'Georgia', 'flag-ch': 'Switzerland', 'flag-pa': 'Panama', 'flag-cr': 'Costa Rica', 'flag-th': 'Thailand',
@@ -558,7 +560,15 @@ p{margin:0}
     'flag-it': 'Italy', 'flag-ie': 'Ireland', 'flag-ro': 'Romania', 'flag-lt': 'Lithuania', 'flag-et': 'Ethiopia', 'flag-gh': 'Ghana', 'flag-ph': 'Philippines',
     'flag-ng': 'Nigeria', 'flag-ke': 'Kenya', 'flag-eg': 'Egypt', 'flag-ma': 'Morocco', 'flag-sn': 'Senegal', 'flag-tz': 'Tanzania', 'flag-dz': 'Algeria',
     'flag-gy': 'Guyana', 'flag-sr': 'Suriname', 'flag-pk': 'Pakistan', 'flag-sa': 'Saudi Arabia', 'flag-tr': 'Turkey', 'flag-id': 'Indonesia', 'flag-ye': 'Yemen',
-    'flag-hu': 'Hungary', 'flag-se': 'Sweden', 'flag-fi': 'Finland'
+    'flag-hu': 'Hungary', 'flag-se': 'Sweden', 'flag-fi': 'Finland', 'flag-de': 'Germany', 'flag-jp': 'Japan', 'flag-gb': 'United Kingdom', 'flag-gb-eng': 'England',
+    'flag-cn': 'China', 'flag-kr': 'South Korea', 'flag-be': 'Belgium', 'flag-ci': 'Côte d\'Ivoire', 'flag-hr': 'Croatia',
+    'art-wave': 'The Great Wave, by\u00a0Hokusai', 'art-ejiri': 'Ejiri in Suruga Province, by\u00a0Hokusai', 'art-kazusa': 'Kazusa Sea Route, by\u00a0Hokusai',
+    'art-ryogoku': 'Sunset across Ryōgoku Bridge, by\u00a0Hokusai', 'art-poppies': 'Poppies, by\u00a0Hokusai', 'art-oiran': 'Oiran and Kamuro, by\u00a0Hokusai',
+    'art-fan': 'Woman Holding a Fan, by\u00a0Hokusai', 'art-inokashira': 'Shrine at Inokashira in Snow, by\u00a0Hiroshige', 'art-prawns': 'Horse Mackerel and Prawns, by\u00a0Hiroshige',
+    'art-monalisa': 'Mona Lisa, by\u00a0Leonardo', 'art-pieta': 'The Pietà, by\u00a0Michelangelo', 'art-bellini': 'Pesaro Altarpiece (detail), by\u00a0Bellini',
+    'art-durer': 'Lion, by\u00a0Dürer', 'art-harvesters': 'The Harvesters, by\u00a0Bruegel', 'art-spring': 'Spring, by\u00a0Arcimboldo', 'art-librarian': 'The Librarian, by\u00a0Arcimboldo',
+    'art-galette': 'Bal du moulin de la Galette, by\u00a0Renoir', 'art-piano': 'Girls at the Piano, by\u00a0Renoir', 'art-bazille': 'Ramparts at Aigues-Mortes, by\u00a0Bazille',
+    'art-cassatt': 'Summertime, by\u00a0Cassatt', 'art-vangogh': 'Village Street in Auvers, by\u00a0Van\u00a0Gogh', 'art-kandinsky': 'Composition VIII, by\u00a0Kandinsky'
   };
 
   // ───────────── the reels ─────────────
@@ -610,6 +620,35 @@ p{margin:0}
       yes: ['chameleon', 'crocodile', ['komodo', 'The largest lizard alive.']],
       no: [['caterpillar', 'An insect.'], ['crab', 'A crustacean.'], ['dolphin', 'A mammal.'], ['narwhal', 'A mammal.'], ['penguin', 'A bird.'],
            'hedgehog', 'pika', 'flyingfox', 'heron', 'kingfisher', 'bee', 'butterfly', 'squirrel', 'alpaca', 'giraffe', 'koala', 'kitten', 'gosling'] },
+    { id: 'eggs', pool: 'animals', q: 'something that lays eggs', yn: 'A bird. Every bird lays eggs.', nn: 'A mammal. It gives birth to live young.',
+      yes: [['penguin', 'Two at a time, in a nest of pebbles.'], ['crocodile', 'Crocodiles bury theirs, then guard the nest.'], ['komodo', 'About twenty at a time, buried in the ground.'],
+            ['bee', 'Honeybees do. A queen can lay more than a thousand a day.'], ['butterfly', 'Egg, caterpillar, chrysalis, butterfly.'], ['crab', 'The females carry them by the thousand.'],
+            'owl', 'heron', 'kingfisher', 'harrier', 'spoonbills', 'swans', 'aracari', 'macaw', ['chickens', 'Famously.'], 'duck'],
+      no: [['dolphin', 'Live young. Dolphins are mammals.'], ['narwhal', 'Live young. Whales are mammals.'], ['flyingfox', 'Live young. Bats are mammals.'], ['koala', 'Live young, raised in a pouch.'],
+           'hedgehog', 'alpaca', 'calf', 'camels', 'cheetah', 'gibbon', 'giraffe', 'goat', 'gorilla', 'horse', 'kitten', 'proboscis', 'macaque', 'meerkats', 'ibex', 'pika', 'redpanda', 'rhino',
+           'squirrel', 'bison', 'jaguar', 'lemur', 'moose', 'panda', 'polarbear', 'cow', 'dog', 'sheep'] },
+    { id: 'nocturnal', pool: 'animals', q: 'a nocturnal animal', nn: 'Up and about by day.',
+      yes: [['owl', 'It hunts in the dark, by ear as much as by eye.'], ['flyingfox', 'Flying foxes roost by day and feed at night.'], ['hedgehog', 'Out after dark, curled up by day.'],
+            ['koala', 'Mostly. It dozes through the day and feeds at night.']],
+      no: [['cheetah', 'Unlike most cats, it hunts by day.'], ['meerkats', 'Up at sunrise, underground by dark.'], ['harrier', 'A bird of prey, but a daytime one.'],
+           ['butterfly', 'Butterflies fly by day. Moths mostly take the night shift.'], ['lemur', 'Ring-tailed lemurs are up by day, sunbathing.'],
+           'gorilla', 'gibbon', 'macaque', 'proboscis', 'squirrel', 'kingfisher', 'bee', 'chickens', 'cow', 'sheep', 'goat', 'swans', 'giraffe', 'alpaca', 'ibex', 'camels', 'aracari', 'macaw',
+           'komodo', 'chameleon', 'pika'] },
+    { id: 'monkey', pool: 'animals', x: 'primates', q: 'a monkey', nn: 'Not a monkey.',
+      yes: [['proboscis', 'A proboscis monkey, from Borneo.'], ['macaque', 'A macaque: an Old World monkey.']],
+      no: [['gibbon', 'An ape. Gibbons have no tail.'], ['gorilla', 'An ape, not a monkey.'], ['lemur', 'A lemur. A primate, but not a monkey.'],
+           'redpanda', 'koala', 'squirrel', 'meerkats', 'flyingfox', 'kitten', 'hedgehog', 'pika', 'panda', 'dog', 'sheep', 'alpaca', 'polarbear', 'cheetah', 'moose'] },
+    { id: 'asiaanimal', pool: 'animals', q: 'an animal native to Asia', nn: 'Not from Asia.',
+      yes: [['panda', 'The mountains of central China.'], ['redpanda', 'The eastern Himalayas and south-west China.'], ['komodo', 'A few islands in Indonesia.'],
+            ['proboscis', 'Borneo, and nowhere else.'], ['gibbon', 'Southeast Asia.'], ['rhino', 'India and Nepal.'], ['camels', 'Two humps: Bactrian camels, from Central Asia.'],
+            ['crocodile', 'Marsh crocodiles, from India and its neighbours.']],
+      no: [['jaguar', 'The Americas. Asia has tigers and leopards.'], ['alpaca', 'The Andes.'], ['bison', 'North America.'], ['koala', 'Australia.'], ['lemur', 'Madagascar.'],
+           ['giraffe', 'Africa.'], ['gorilla', 'Central Africa.'], ['meerkats', 'Southern Africa.'], ['penguin', 'A chinstrap penguin, from the Antarctic.'], 'aracari', 'macaw'] },
+    { id: 'namerica', pool: 'animals', q: 'an animal native to North America', nn: 'Not from North America.',
+      yes: [['bison', 'The Great Plains.'], ['moose', 'Alaska, Canada and the northern states.'], ['harrier', 'The northern harrier, North America\'s only harrier.'],
+            ['polarbear', 'The Arctic, including Alaska and northern Canada.'], ['jaguar', 'Mexico and Central America are part of North America.']],
+      no: [['alpaca', 'South America.'], ['hedgehog', 'No hedgehog is native to the Americas.'], ['chameleon', 'Chameleons are Old World animals.'], ['camels', 'Central Asia.'],
+           ['penguin', 'The Antarctic.'], ['koala', 'Australia.'], 'cheetah', 'giraffe', 'gorilla', 'meerkats', 'lemur', 'panda', 'redpanda', 'komodo', 'proboscis', 'gibbon', 'rhino', 'ibex', 'macaque'] },
     // ---- landmarks
     { id: 'france', pool: 'landmarks', q: 'a landmark in France',
       yes: ['eiffel', 'montstmichel', 'chambord', 'chenonceau', 'carcassonne', 'pontdugard', 'notredame', 'louvre'],
@@ -641,7 +680,7 @@ p{margin:0}
       no: [['parthenon', 'Greek, and about 500 years older than the Colosseum.'], ['brandenburg', 'Prussian, 1791.'], ['lincoln', 'American, 1922. It only looks ancient.'],
            ['petra', 'Carved by the Nabataeans.'], ['pisa', 'Medieval. Begun in 1173.'], ['sanmarcos', 'Spanish, 1695.'], ['gizapyr', 'Egyptian, and older than Rome itself.'],
            'reims', 'notredame', 'berlindom', 'worms', 'montstmichel', 'papes', 'sumter', 'taj', 'machu', 'greatwall', 'chichen', 'neuschwanstein', 'towerbridge', 'capitol', 'chambord', 'eilean'] },
-    { id: 'pyramid', pool: 'landmarks', q: 'an Egyptian pyramid',
+    { id: 'pyramid', pool: 'landmarks', x: 'pyramids', q: 'an Egyptian pyramid',
       yes: ['gizapyr', ['bent', 'The Bent Pyramid at Dahshur.'], ['redpyr', 'The Red Pyramid at Dahshur.'], ['meidum', 'The collapsed pyramid at Meidum.'], 'giza3'],
       no: [['chichen', 'A Maya pyramid, in Mexico.'], ['louvre', 'A glass one, in Paris.'], ['stupa', 'A Buddhist stupa, in India.'],
            'machu', 'petra', 'taj', 'colosseum', 'greatwall', 'konark', 'qutub', 'rushmore', 'montstmichel', 'eiffel', 'empire', 'pisa', 'sumter', 'hawa', 'capitol'] },
@@ -652,14 +691,87 @@ p{margin:0}
            ['schwerin', '1857.'], ['hawa', '1799.'], ['taj', 'The 1600s.'], ['colosseum', 'AD 80.'], ['machu', 'About 1450.'], ['notredame', 'Finished in 1345.'], ['chambord', 'The 1500s.'],
            ['charminar', '1591.'], ['qutub', 'About 1200.'], ['pisa', 'Finished in 1372.'], ['parthenon', '432 BC.'], ['capitol', 'The 1800s.'], ['winter', '1762.'], ['egeskov', '1554.'],
            'gizapyr', 'greatwall', 'petra', 'chichen', 'montstmichel'] },
-    // ---- planets
+    { id: 'capcity', pool: 'landmarks', q: 'a landmark in a national capital', nn: 'Not in a national capital.',
+      yes: [['eiffel', 'Paris, capital of France.'], ['notredame', 'Paris, capital of France.'], ['louvre', 'Paris, capital of France.'], ['colosseum', 'Rome, capital of Italy.'],
+            ['parthenon', 'Athens, capital of Greece.'], ['brandenburg', 'Berlin, capital of Germany.'], ['berlindom', 'Berlin, capital of Germany.'],
+            ['towerbridge', 'London, capital of the United Kingdom.'], ['lincoln', 'Washington, D.C.'], ['capitol', 'Washington, D.C. It is where Congress sits.']],
+      no: [['opera', 'Sydney. Australia\'s capital is Canberra.'], ['redeemer', 'Rio. Brazil\'s capital is Brasília.'], ['liberty', 'New York. The capital is Washington, D.C.'],
+           ['empire', 'New York. The capital is Washington, D.C.'], ['winter', 'St Petersburg was the capital when it was built. Moscow is now.'], ['gateway', 'Mumbai. India\'s capital is New Delhi.'],
+           ['taj', 'Agra. India\'s capital is New Delhi.'], ['victoria', 'Kolkata was the capital of British India until 1911. Not since.'], ['nagoya', 'Japan\'s capital is Tokyo.'],
+           ['pisa', 'Italy\'s capital is Rome.'], ['neuschwanstein', 'Bavaria. Germany\'s capital is Berlin.'], ['schwerin', 'Schwerin is a state capital, not the national one.'],
+           ['hawa', 'Jaipur is a state capital, not the national one.'], ['machu', 'Peru\'s capital is Lima.'], ['chichen', 'Mexico\'s capital is Mexico City.'],
+           'petra', 'montstmichel', 'chambord', 'rushmore', 'golden', 'eilean', 'egeskov', 'carcassonne', 'mysore', 'worms', 'sumter', 'konark'] },
+    { id: 'tomb', pool: 'landmarks', x: 'pyramids', q: 'a tomb', nn: 'Not a tomb.',
+      yes: [['taj', 'Shah Jahan built it for his wife, Mumtaz Mahal. He lies beside her.'], ['gizapyr', 'Built for the pharaoh Khufu, about 4,500 years ago.'],
+            ['giza3', 'Three pharaohs, three tombs: Khufu, Khafre and Menkaure.'], ['redpyr', 'Built for the pharaoh Sneferu.'],
+            ['bent', 'Built for the pharaoh Sneferu, who then ordered a better one.'], ['meidum', 'A royal tomb, some 4,600 years old.']],
+      no: [['lincoln', 'A memorial. Lincoln is buried in Springfield, Illinois.'], ['victoria', 'A memorial. Queen Victoria is buried at Windsor.'],
+           ['chichen', 'A temple to the feathered serpent Kukulcán, not a tomb.'], ['capitol', 'A crypt was built under the dome for George Washington. He stayed at Mount Vernon.'],
+           ['louvre', 'A museum entrance.'], ['rushmore', 'A sculpture. Nobody is buried there.'], ['qutub', 'A victory tower.'], ['parthenon', 'A temple to Athena.'], ['pisa', 'A bell tower.'],
+           ['hawa', 'A screen of windows, so the royal women could watch the street unseen.'],
+           'eiffel', 'colosseum', 'empire', 'opera', 'towerbridge', 'brandenburg', 'neuschwanstein', 'chambord', 'mysore', 'gateway', 'konark', 'nagoya', 'sumter', 'sanmarcos',
+           'machu', 'redeemer', 'carcassonne', 'arles', 'pontdugard', 'eilean', 'egeskov', 'liberty'] },
+    { id: 'germany', pool: 'landmarks', q: 'a landmark in Germany', nn: 'Not in Germany.',
+      yes: ['brandenburg', 'berlindom', ['neuschwanstein', 'Bavaria, near the Austrian border.'], 'schwerin', 'worms',
+            ['trierbaths', 'Roman baths at Trier, which calls itself Germany\'s oldest city.']],
+      no: [['chambord', 'France. The Loire valley.'], ['chenonceau', 'France. The Loire valley.'], ['egeskov', 'Denmark.'], ['eilean', 'Scotland.'], ['reims', 'France.'], ['papes', 'Avignon, in France.'],
+           ['winter', 'Russia.'], ['montstmichel', 'France.'], ['carcassonne', 'France.'], ['towerbridge', 'London.'], ['pisa', 'Italy.'],
+           'notredame', 'colosseum', 'parthenon', 'eiffel', 'louvre', 'arles', 'pontdugard', 'capitol', 'lincoln', 'nagoya', 'opera', 'taj', 'victoria', 'mysore', 'sanmarcos'] },
+    { id: 'castle', pool: 'landmarks', q: 'a castle', nn: 'Not a castle.',
+      yes: [['neuschwanstein', 'A king\'s fantasy of one, begun in 1869.'], ['eilean', 'Eilean Donan, on its own small island.'], ['egeskov', 'A moated one, standing on oak piles in a lake.'],
+            ['nagoya', 'Built on the orders of Tokugawa Ieyasu. The keep is a post-war rebuild.']],
+      no: [['towerbridge', 'A bridge. The castle is next door: the Tower of London.'], ['winter', 'A palace.'], ['mysore', 'A palace.'], ['montstmichel', 'An abbey on a rock.'],
+           ['brandenburg', 'A city gate.'], ['sumter', 'A sea fort.'], ['worms', 'A cathedral.'], ['reims', 'A cathedral.'], ['notredame', 'A cathedral.'], ['berlindom', 'A church.'],
+           ['hawa', 'A palace front: five storeys of windows.'], 'capitol', 'taj', 'colosseum', 'parthenon', 'pisa', 'opera', 'eiffel', 'empire', 'rushmore', 'lincoln', 'golden', 'qutub',
+           'charminar', 'konark', 'gateway', 'victoria', 'redeemer', 'chichen', 'gizapyr', 'pontdugard', 'arles'] },
+    // ---- art
+    { id: 'fuji', pool: 'art', x: 'japan', q: 'a picture with Mount Fuji in it', nn: 'No Fuji in this one.',
+      yes: [['art-wave', 'Small and snow-capped, in the trough of the wave.'], ['art-ejiri', 'Drawn in a single thin line, behind the wind.'], ['art-kazusa', 'A white speck on the horizon.'],
+            ['art-ryogoku', 'In blue, beyond the bridge.']],
+      no: [['art-inokashira', 'Snow, pines and a shrine. No mountain.'], ['art-poppies', 'Hokusai, but only flowers.'], ['art-monalisa', 'Mountains behind her, yes. Fuji, no.'],
+           ['art-kandinsky', 'Plenty of triangles. None of them is Fuji.'], ['art-bellini', 'A hill with a castle on it, in Italy.'],
+           'art-prawns', 'art-oiran', 'art-fan', 'art-bazille', 'art-vangogh', 'art-cassatt', 'art-galette', 'art-piano', 'art-durer', 'art-spring', 'art-librarian', 'art-pieta', 'art-harvesters'] },
+    { id: 'boat', pool: 'art', x: 'japan', q: 'a picture with a boat in it', nn: 'No boat in this one.',
+      yes: [['art-wave', 'Three of them, about to have a very bad day.'], ['art-kazusa', 'It fills the picture.'], ['art-ryogoku', 'A ferry, crossing the Sumida River.'],
+            ['art-cassatt', 'A rowing boat, with ducks alongside.'], ['art-bazille', 'Moored on the right, under the tower.']],
+      no: [['art-prawns', 'Fish and prawns, but nobody fishing.'], ['art-inokashira', 'Water and a bridge, but no boat.'], ['art-monalisa', 'A bridge over her shoulder, but no boat.'],
+           ['art-ejiri', 'Hats and paper in the wind, but no boat.'],
+           'art-poppies', 'art-oiran', 'art-fan', 'art-vangogh', 'art-kandinsky', 'art-galette', 'art-piano', 'art-durer', 'art-spring', 'art-librarian', 'art-pieta', 'art-bellini'] },
+    { id: 'impressionist', pool: 'art', x: 'french', q: 'an Impressionist painting', nn: 'Not Impressionist.',
+      yes: [['art-galette', 'Renoir showed it at the Impressionist exhibition of 1877.'], ['art-piano', 'Renoir, in 1892.'],
+            ['art-cassatt', 'Mary Cassatt, the American who exhibited with the Impressionists in Paris.']],
+      no: [['art-vangogh', 'Post-Impressionist. Van Gogh came just after, and pushed further.'], ['art-kandinsky', 'Abstract, and half a century later.'],
+           ['art-wave', 'A Japanese print. The Impressionists collected them.'], ['art-monalisa', 'Renaissance. Some 370 years too early.'], ['art-harvesters', 'Bruegel, 1565. Three centuries too early.'],
+           'art-ejiri', 'art-kazusa', 'art-ryogoku', 'art-poppies', 'art-inokashira', 'art-prawns', 'art-oiran', 'art-fan', 'art-durer', 'art-bellini', 'art-spring', 'art-librarian', 'art-pieta'] },
+    { id: 'frenchart', pool: 'art', x: 'french', q: 'a painting by a French artist', nn: 'Not by a French artist.',
+      yes: [['art-galette', 'Renoir, born in Limoges.'], ['art-piano', 'Renoir, born in Limoges.'], ['art-bazille', 'Frédéric Bazille, from Montpellier.']],
+      no: [['art-monalisa', 'It hangs in Paris, but Leonardo was Italian.'], ['art-vangogh', 'Painted in France, but Van Gogh was Dutch.'], ['art-cassatt', 'Painted in France, but Mary Cassatt was American.'],
+           ['art-spring', 'It hangs in the Louvre, but Arcimboldo was Italian.'], ['art-harvesters', 'Bruegel was Flemish.'], ['art-durer', 'Dürer was German.'],
+           'art-librarian', 'art-bellini', 'art-pieta', 'art-wave', 'art-ejiri', 'art-kazusa', 'art-ryogoku', 'art-poppies', 'art-inokashira', 'art-prawns', 'art-oiran', 'art-fan'] },
+    { id: 'old400', pool: 'art', q: 'an artwork more than 400 years old', nn: 'Not that old.',
+      yes: [['art-monalisa', 'Begun around 1503.'], ['art-pieta', 'Finished in 1499, when Michelangelo was 24.'], ['art-durer', 'Dürer painted it in 1494.'], ['art-bellini', 'The 1470s.'],
+            ['art-harvesters', '1565.'], ['art-spring', '1573.'], ['art-librarian', 'About 1566.']],
+      no: [['art-wave', 'About 1831.'], ['art-kandinsky', '1923.'], ['art-galette', '1876.'], ['art-vangogh', '1890.'], ['art-piano', '1892.'], ['art-cassatt', '1894.'], ['art-bazille', '1867.'],
+           ['art-ejiri', 'The early 1830s.'], ['art-kazusa', 'The early 1830s.'], ['art-ryogoku', 'The early 1830s.'], ['art-poppies', 'The 1830s.'],
+           'art-inokashira', 'art-prawns', 'art-oiran', 'art-fan'] },
+    // ---- space
     { id: 'bigger', pool: 'planets', x: 'planets', q: 'a planet bigger than Earth',
       yes: [['jupiter', 'Eleven Earths wide.'], ['saturn', 'Nine Earths wide, not counting the rings.'], ['uranus', 'Four Earths wide.'], ['neptune', 'Nearly four Earths wide.']],
       no: [['venus', 'Close. About 95% of Earth\'s width.'], ['mars', 'About half Earth\'s width.'], ['mercury', 'The smallest planet.'], ['earth', 'Exactly the same size as Earth.'],
-           ['sun', 'Much bigger, but it is a star.']] },
+           ['sun', 'Much bigger, but it is a star.'], ['ganymede', 'A moon. Bigger than Mercury, but nowhere near Earth.'], ['titan', 'A moon, about 40% of Earth\'s width.']] },
     { id: 'rocky', pool: 'planets', x: 'planets', q: 'a rocky planet', yn: 'One of the four rocky planets.',
       yes: ['mercury', 'venus', 'earth', 'mars'],
-      no: [['jupiter', 'A gas giant.'], ['saturn', 'A gas giant.'], ['uranus', 'An ice giant.'], ['neptune', 'An ice giant.'], ['sun', 'A star.']] },
+      no: [['jupiter', 'A gas giant.'], ['saturn', 'A gas giant.'], ['uranus', 'An ice giant.'], ['neptune', 'An ice giant.'], ['sun', 'A star.'], ['moon', 'Rocky, but a moon.'], ['io', 'Rocky, but a moon of Jupiter.']] },
+    { id: 'moons', pool: 'planets', q: 'a moon', nn: 'A planet, not a moon.',
+      yes: [['moon', 'Ours.'], ['io', 'A moon of Jupiter, and the most volcanic place known.'], ['europa', 'A moon of Jupiter. That shell of ice very likely covers an ocean.'],
+            ['ganymede', 'A moon of Jupiter, and bigger than Mercury.'], ['callisto', 'A moon of Jupiter, cratered all over.'], ['titan', 'Saturn\'s largest moon. The orange is haze.']],
+      no: [['mercury', 'A planet. It only looks like the Moon.'], ['mars', 'A planet. It has two small moons of its own.'], ['earth', 'A planet. Ours.'], ['sun', 'A star.'],
+           'venus', 'jupiter', 'saturn', 'uranus', 'neptune'] },
+    { id: 'nomoons', pool: 'planets', x: 'planets', q: 'a planet with no moons',
+      yes: [['mercury', 'None at all.'], ['venus', 'None. Only Mercury and Venus go without.']],
+      no: [['earth', 'One.'], ['mars', 'Two small ones, Phobos and Deimos.'], ['jupiter', 'Dozens. Four are big enough to see with binoculars.'], ['saturn', 'More known moons than any other planet.'],
+           ['uranus', 'More than two dozen, named after characters in Shakespeare and Pope.'], ['neptune', 'More than a dozen. The big one is Triton.'], ['sun', 'A star, not a planet.'],
+           ['moon', 'That is a moon.'], ['titan', 'That is a moon: Saturn\'s largest.'], ['ganymede', 'That is a moon: Jupiter\'s largest.']] },
     // ---- flags
     { id: 'unionjack', pool: 'flags', q: 'a flag with the Union Jack on it',
       yes: F('au nz fj tv'), no: F('us lr my ws to no is dk gr do cu cl ge ch pa cr th fr nl ru ca in za jm') },
@@ -673,6 +785,39 @@ p{margin:0}
       yes: F('ng ke za eg gh et ma sn tz dz'),
       no: [['flag-jm', 'The Caribbean.'], ['flag-bo', 'South America.'], ['flag-gy', 'South America.'], ['flag-sr', 'South America.'], ['flag-lt', 'Europe.'],
            ['flag-ye', 'Arabia. Egypt\'s has an eagle in the middle.']].concat(F('in ie it br mx pk sa tr id hu')) },
+    { id: 'g7', pool: 'flags', q: 'the flag of a G7 country', yn: 'One of the seven.', nn: 'Not in the G7.',
+      yes: F('us ca fr it de jp gb'),
+      no: [['flag-ru', 'It was the G8 until Russia was suspended in 2014.'], ['flag-cn', 'The second-largest economy in the world, and not a member.'],
+           ['flag-in', 'Often a guest at the summit. Not a member.'], ['flag-kr', 'Often a guest at the summit. Not a member.'], ['flag-br', 'In the G20, not the G7.'],
+           ['flag-es', 'The EU has a seat at the table. Spain itself does not.']].concat(F('au mx nl ch se tr sa ar za id be')) },
+    { id: 'worldcup', pool: 'flags', q: 'a country that has won the men\'s World Cup', nn: 'Never won it.',
+      yes: [['flag-br', 'Five times, more than anyone.'], ['flag-de', 'Four times.'], ['flag-it', 'Four times.'], ['flag-ar', 'Three times, most recently in 2022.'],
+            ['flag-fr', 'Twice: 1998 and 2018.'], ['flag-uy', 'Twice, including the very first, in 1930.'], ['flag-es', 'Twice: 2010 and 2026.'], ['flag-gb-eng', 'Once, at home, in 1966.']],
+      no: [['flag-nl', 'Three finals, three defeats.'], ['flag-gb', 'England won in 1966, under its own flag. There is no United Kingdom team.'], ['flag-hr', 'Runners-up in 2018.'],
+           ['flag-pt', 'European champions in 2016. Never world champions.'], ['flag-hu', 'Runners-up twice, in 1938 and 1954.'], ['flag-se', 'Runners-up in 1958, at home.'],
+           ['flag-us', 'The women have won it four times. The men have not.'], ['flag-jp', 'The women won it in 2011. The men have not.'], ['flag-no', 'The women won it in 1995. The men have not.'],
+           ['flag-be', 'Third place in 2018 is the best so far.']].concat(F('mx cl co kr ma gh ng dk ch')) },
+    { id: 'olympics', pool: 'flags', q: 'a country that has hosted the Summer Olympics', nn: 'Never hosted the Summer Games.',
+      yes: [['flag-us', 'St. Louis, Los Angeles twice, and Atlanta.'], ['flag-gb', 'London, three times.'], ['flag-fr', 'Paris, three times.'], ['flag-de', 'Berlin in 1936 and Munich in 1972.'],
+            ['flag-jp', 'Tokyo, twice.'], ['flag-au', 'Melbourne in 1956 and Sydney in 2000.'], ['flag-gr', 'Athens, starting with the first modern Games in 1896.'], ['flag-cn', 'Beijing, 2008.'],
+            ['flag-kr', 'Seoul, 1988.'], ['flag-it', 'Rome, 1960.'], ['flag-es', 'Barcelona, 1992.'], ['flag-mx', 'Mexico City, 1968.'], ['flag-ca', 'Montreal, 1976.'],
+            ['flag-br', 'Rio de Janeiro, 2016.'], ['flag-nl', 'Amsterdam, 1928.'], ['flag-se', 'Stockholm, 1912.'], ['flag-fi', 'Helsinki, 1952.'], ['flag-be', 'Antwerp, 1920.']],
+      no: [['flag-ch', 'The Winter Games twice, at St. Moritz. Never the Summer ones.'], ['flag-no', 'The Winter Games twice. Never the Summer ones.'],
+           ['flag-ar', 'Buenos Aires hosted the Youth Olympics in 2018, but never the Games themselves.'], ['flag-tr', 'Istanbul has bid five times and lost five times.'],
+           ['flag-hu', 'Budapest has bid several times. Never chosen.']].concat(F('in za eg ie pt dk nz th ng ke pk cl co pe cu jm ph id')) },
+    { id: 'rwb', pool: 'flags', q: 'a flag that is only red, white and blue', yn: 'Red, white and blue, and nothing else.', nn: 'Count the colours again.',
+      yes: F('us fr gb nl ru cu cl th cr pa no is lr au nz ws'),
+      no: [['flag-tv', 'So close. The stars are yellow.'], ['flag-my', 'So close. The moon and star are yellow.'], ['flag-ph', 'So close. The sun and stars are yellow.'],
+           ['flag-kr', 'Red, white, blue and black.'], ['flag-jp', 'Only red and white.'], ['flag-ch', 'Only red and white.'], ['flag-dk', 'Only red and white.'], ['flag-ca', 'Only red and white.'],
+           ['flag-pe', 'Only red and white.'], ['flag-to', 'Only red and white.'], ['flag-ge', 'Only red and white.'], ['flag-gb-eng', 'Only red and white.'],
+           ['flag-gr', 'Only blue and white.'], ['flag-fi', 'Only blue and white.'], ['flag-hn', 'Only blue and white.']].concat(F('de be it ie se br in za jm co ar')) },
+    { id: 'vertical', pool: 'flags', q: 'a flag with three vertical stripes', yn: 'Three stripes, side by side.', nn: 'No three vertical stripes here.',
+      yes: F('fr it ie be ro ci ng pe').concat([['flag-mx', 'Green, white, red, with an eagle on the white.'], ['flag-gt', 'Blue, white, blue, with a quetzal on the white.'],
+            ['flag-sn', 'Green, yellow, red, with a star on the yellow.'], ['flag-ca', 'Red, white, red. The white one is double width and carries the leaf.']]),
+      no: [['flag-nl', 'Three stripes, but horizontal ones.'], ['flag-de', 'Three stripes, but horizontal ones.'], ['flag-ru', 'Three stripes, but horizontal ones.'],
+           ['flag-hu', 'Three stripes, but horizontal ones.'], ['flag-lt', 'Three stripes, but horizontal ones.'], ['flag-th', 'Five stripes, and horizontal ones.'],
+           ['flag-us', 'Thirteen stripes, all horizontal.'], ['flag-dz', 'Two halves, not three stripes.'], ['flag-pt', 'Two bands, not three.']]
+          .concat(F('co in et gh eg ye es bo hr ar jp ch gb br cn kr tr gr cu')) },
     // ---- words: names and numbers on title slides
     { id: 'egot', pool: 'words', words: true, q: 'an EGOT winner',
       yes: [['Mel Brooks', 'Completed the set in 2001 with Tonys for The Producers.'], ['Whoopi Goldberg', 'Completed the set in 2002 with a Tony as a producer of Thoroughly Modern Millie.'],
@@ -720,6 +865,85 @@ p{margin:0}
            ['West Side Story', 'Romeo and Juliet set to music, but not his.'], ['Kiss Me, Kate', 'Cole Porter, riffing on The Taming of the Shrew.'], ['The School for Scandal', 'Richard Brinsley Sheridan.'],
            ['She Stoops to Conquer', 'Oliver Goldsmith.'], ['Paradise Lost', 'John Milton, and a poem.'], ['The Canterbury Tales', 'Geoffrey Chaucer, two centuries earlier.'],
            ['Cyrano de Bergerac', 'Edmond Rostand.'], ['Don Quixote', 'Cervantes, and a novel.']] },
+    { id: 'bond', pool: 'words', words: true, q: 'a James Bond film', yn: 'An official Bond film.', nn: 'No Bond in it.',
+      yes: [['Dr. No', 'The first, in 1962.'], 'Goldfinger', 'Thunderball', ['Moonraker', 'Bond in space, 1979.'], ['Octopussy', 'Yes, really. 1983.'], 'GoldenEye', 'Skyfall', 'Spectre',
+            'Live and Let Die', 'The Living Daylights', 'Licence to Kill', 'Casino Royale', 'Quantum of Solace', 'A View to a Kill', 'You Only Live Twice', 'Diamonds Are Forever',
+            'For Your Eyes Only', 'Tomorrow Never Dies', 'The World Is Not Enough', 'Die Another Day', 'No Time to Die', 'From Russia with Love', 'The Man with the Golden Gun',
+            'The Spy Who Loved Me', 'On Her Majesty\'s Secret Service'],
+      no: [['The Spy Who Came in from the Cold', 'John le Carré. Bond\'s is The Spy Who Loved Me.'], ['Goldmember', 'Austin Powers. Bond\'s is Goldfinger.'],
+           ['The Man with the Golden Arm', 'Frank Sinatra, 1955. Bond\'s man has a golden gun.'], ['You Only Live Once', 'Fritz Lang, 1937. Bond lives twice.'],
+           ['From Paris with Love', 'John Travolta, 2010. Bond\'s is From Russia.'], ['Dr. Strangelove', 'Stanley Kubrick. Bond\'s doctor is Dr. No.'],
+           ['Moonstruck', 'Cher won an Oscar for it. Bond\'s is Moonraker.'], ['Tomorrow Never Knows', 'A Beatles song. Bond\'s is Tomorrow Never Dies.'],
+           ['License to Drive', 'A 1988 teen comedy. Bond\'s is Licence to Kill.'], ['For Your Consideration', 'A Christopher Guest comedy. Bond\'s is For Your Eyes Only.'],
+           ['The Bourne Identity', 'Jason Bourne. Same initials, different spy.'], ['Mission: Impossible', 'Ethan Hunt\'s job.'], ['Kingsman: The Secret Service', 'A different British spy in a good suit.'],
+           ['Tinker Tailor Soldier Spy', 'John le Carré. George Smiley\'s case.'], ['Johnny English', 'Rowan Atkinson, sending Bond up.'], ['The Ipcress File', 'Harry Palmer, played by Michael Caine.'],
+           ['The Man from U.N.C.L.E.', 'Napoleon Solo. Ian Fleming helped dream him up, though.'], ['The Hunt for Red October', 'Jack Ryan\'s film. Sean Connery is in it, though.'],
+           ['North by Northwest', 'Hitchcock. The Bond films borrowed plenty from it.'], 'True Lies', 'Tenet', 'Atomic Blonde', 'Charade', 'Ronin', 'Die Hard'] },
+    { id: 'beatles', pool: 'words', words: true, q: 'a Beatles song', yn: 'The Beatles.', nn: 'Not a Beatles song.',
+      yes: ['Hey Jude', 'Yesterday', 'Let It Be', 'Penny Lane', 'Eleanor Rigby', 'Help!', 'Blackbird', 'Yellow Submarine', 'Come Together', ['Something', 'George Harrison wrote it, for Abbey Road.'],
+            'Here Comes the Sun', 'Ticket to Ride', 'Day Tripper', 'Paperback Writer', 'Michelle', 'Norwegian Wood', 'Get Back', 'Lady Madonna', 'Strawberry Fields Forever', 'A Hard Day\'s Night',
+            ['Octopus\'s Garden', 'One of Ringo\'s.'], 'While My Guitar Gently Weeps', 'I Am the Walrus', ['Tomorrow Never Knows', 'The last track on Revolver.'], 'Back in the U.S.S.R.'],
+      no: [['Imagine', 'John Lennon, solo, in 1971.'], ['Band on the Run', 'Paul McCartney and Wings.'], ['My Sweet Lord', 'George Harrison, solo.'],
+           ['Live and Let Die', 'Paul McCartney and Wings, for a Bond film.'], ['Photograph', 'Ringo Starr, solo.'], ['Maybe I\'m Amazed', 'Paul McCartney, solo.'], ['Jealous Guy', 'John Lennon, solo.'],
+           ['Instant Karma!', 'John Lennon, as a solo single.'], ['(I Can\'t Get No) Satisfaction', 'The Rolling Stones.'], ['Ruby Tuesday', 'The Rolling Stones.'], ['Paint It Black', 'The Rolling Stones.'],
+           ['Good Vibrations', 'The Beach Boys.'], ['God Only Knows', 'The Beach Boys. Paul McCartney has called it a favourite.'], ['Waterloo Sunset', 'The Kinks.'], ['My Generation', 'The Who.'],
+           ['Mrs. Robinson', 'Simon & Garfunkel.'], ['I\'m a Believer', 'The Monkees.'], ['Daydream Believer', 'The Monkees.'], ['The House of the Rising Sun', 'The Animals.'], ['Wild Thing', 'The Troggs.'],
+           ['Space Oddity', 'David Bowie.'], ['Wonderwall', 'Oasis.'], ['Bohemian Rhapsody', 'Queen.'], ['Mr. Tambourine Man', 'Bob Dylan wrote it. The Byrds had the hit.'],
+           ['California Dreamin\'', 'The Mamas & the Papas.'], ['Sunshine of Your Love', 'Cream.'], ['Happy Together', 'The Turtles.'], ['A Whiter Shade of Pale', 'Procol Harum.'],
+           ['Brown Eyed Girl', 'Van Morrison.']] },
+    { id: 'pixar', pool: 'words', words: true, q: 'a Pixar film', yn: 'Pixar.', nn: 'Not Pixar.',
+      yes: [['Toy Story', 'The first one, in 1995.'], 'Up', 'WALL-E', 'Ratatouille', 'Coco', 'Cars', 'Brave', 'Soul', 'Luca', 'Inside Out', 'Finding Nemo', 'Monsters, Inc.', 'The Incredibles',
+            ['A Bug\'s Life', 'Pixar\'s second film, in 1998.'], 'Onward', 'Turning Red', 'Elemental', 'The Good Dinosaur', 'Finding Dory', 'Lightyear'],
+      no: [['Shrek', 'DreamWorks.'], ['Antz', 'DreamWorks. It reached cinemas a few weeks before A Bug\'s Life.'], ['Frozen', 'Disney Animation. Same parent company, different studio.'],
+           ['Moana', 'Disney Animation.'], ['Tangled', 'Disney Animation.'], ['Zootopia', 'Disney Animation.'], ['Encanto', 'Disney Animation.'], ['Big Hero 6', 'Disney Animation.'],
+           ['Wreck-It Ralph', 'Disney Animation.'], ['Bolt', 'Disney Animation.'], ['The Lion King', 'Disney Animation.'], ['Lilo & Stitch', 'Disney Animation.'],
+           ['Planes', 'Disney, not Pixar, though it is set in the world of Cars.'], ['Despicable Me', 'Illumination.'], ['Minions', 'Illumination.'], ['Sing', 'Illumination.'],
+           ['Ice Age', 'Blue Sky.'], ['Rio', 'Blue Sky.'], ['Kung Fu Panda', 'DreamWorks.'], ['How to Train Your Dragon', 'DreamWorks.'], ['Madagascar', 'DreamWorks.'], ['Megamind', 'DreamWorks.'],
+           ['Shark Tale', 'DreamWorks. Pixar\'s fish film is Finding Nemo.'], ['Spirited Away', 'Studio Ghibli.'], ['Rango', 'Animated by Industrial Light & Magic.'], ['Chicken Run', 'Aardman.'],
+           ['The Lego Movie', 'Warner Bros.'], ['Cloudy with a Chance of Meatballs', 'Sony.'], ['Spider-Man: Into the Spider-Verse', 'Sony.']] },
+    { id: 'greekgod', pool: 'words', words: true, q: 'a Greek god or goddess', nn: 'Not a Greek god.',
+      yes: [['Zeus', 'King of the gods.'], ['Hera', 'Queen of the gods.'], ['Poseidon', 'God of the sea.'], ['Athena', 'Goddess of wisdom and war.'], ['Ares', 'God of war.'], ['Hermes', 'The messenger.'],
+            ['Aphrodite', 'Goddess of love.'], ['Artemis', 'Goddess of the hunt.'], ['Hades', 'God of the underworld.'], ['Demeter', 'Goddess of the harvest.'], ['Hephaestus', 'God of the forge.'],
+            ['Dionysus', 'God of wine.'], ['Hestia', 'Goddess of the hearth.'], ['Eros', 'God of love. The Romans called him Cupid.'], ['Nike', 'Goddess of victory, long before the shoes.'],
+            ['Persephone', 'Queen of the underworld.']],
+      no: [['Jupiter', 'Roman. The Greeks called him Zeus.'], ['Neptune', 'Roman. The Greeks called him Poseidon.'], ['Mars', 'Roman. The Greeks called him Ares.'],
+           ['Venus', 'Roman. The Greeks called her Aphrodite.'], ['Mercury', 'Roman. The Greeks called him Hermes.'], ['Minerva', 'Roman. The Greeks called her Athena.'],
+           ['Juno', 'Roman. The Greeks called her Hera.'], ['Vulcan', 'Roman. The Greeks called him Hephaestus.'], ['Diana', 'Roman. The Greeks called her Artemis.'],
+           ['Cupid', 'Roman. The Greeks called him Eros.'], ['Ceres', 'Roman. The Greeks called her Demeter.'], ['Vesta', 'Roman. The Greeks called her Hestia.'],
+           ['Saturn', 'Roman. The Greeks called him Cronus.'], ['Janus', 'Roman, with no Greek counterpart.'], ['Thor', 'Norse.'], ['Odin', 'Norse.'], ['Loki', 'Norse.'], ['Freya', 'Norse.'],
+           ['Anubis', 'Egyptian.'], ['Osiris', 'Egyptian.'], ['Ra', 'Egyptian.'], ['Achilles', 'A hero, and a mortal one. Ask his heel.'], ['Odysseus', 'A mortal king, trying to get home.'],
+           ['Agamemnon', 'A mortal king.'], ['Medusa', 'A Gorgon, and mortal, as Perseus proved.'], ['Homer', 'A poet. He wrote about them.'], ['Socrates', 'A philosopher. Athens tried him for impiety.']] },
+    { id: 'element', pool: 'words', words: true, q: 'a chemical element', nn: 'Not on the periodic table.',
+      yes: [['Tin', 'Number 50. Its symbol is Sn.'], ['Neon', 'Number 10.'], ['Zinc', 'Number 30.'], ['Argon', 'Number 18.'], ['Cobalt', 'Number 27.'], ['Boron', 'Number 5.'], ['Radon', 'Number 86.'],
+            ['Iodine', 'Number 53.'], ['Xenon', 'Number 54.'], ['Krypton', 'Real. Number 36, a noble gas.'], ['Tungsten', 'Number 74. Its symbol is W, for wolfram.'], ['Antimony', 'Number 51.'],
+            ['Bismuth', 'Number 83.'], ['Einsteinium', 'Number 99, named for Einstein.'], ['Californium', 'Number 98, first made at Berkeley.'],
+            ['Americium', 'Number 95. There is a speck of it in many smoke detectors.'], ['Francium', 'Number 87, named for France.'], ['Gallium', 'Number 31. It melts in your hand.'],
+            ['Germanium', 'Number 32.'], ['Polonium', 'Number 84. Marie Curie named it for Poland.'], ['Yttrium', 'Number 39, named for a village in Sweden.'],
+            ['Tennessine', 'Number 117, named for Tennessee.']],
+      no: [['Steel', 'An alloy: iron with a little carbon.'], ['Bronze', 'An alloy of copper and tin.'], ['Brass', 'An alloy of copper and zinc.'], ['Pewter', 'An alloy, mostly tin.'],
+           ['Electrum', 'A natural alloy of gold and silver.'], ['Kryptonite', 'Superman\'s problem. Krypton is the real one.'], ['Adamantium', 'Wolverine\'s claws. Fictional.'],
+           ['Vibranium', 'Captain America\'s shield. Fictional.'], ['Unobtainium', 'What they mine in Avatar. Fictional.'], ['Dilithium', 'It powers the Enterprise. Not on the table.'],
+           ['Mithril', 'Tolkien\'s. Fictional.'], ['Ammonia', 'A compound: nitrogen and hydrogen.'], ['Methane', 'A compound: carbon and hydrogen.'], ['Quartz', 'A mineral: silicon and oxygen.'],
+           ['Zircon', 'A mineral. Zirconium is the element.'], ['Corundum', 'A mineral: the stuff of rubies and sapphires.'], ['Obsidian', 'Volcanic glass.'], ['Amber', 'Fossilised tree resin.'],
+           ['Granite', 'A rock.'], ['Plasma', 'A state of matter.'], ['Teflon', 'A plastic, and a brand name.'], ['Kevlar', 'A synthetic fibre.'], ['Geranium', 'A flower. Germanium is the element.'],
+           ['Harmonium', 'A reed organ.'], ['Byzantium', 'A city: old Istanbul.'], ['Pandemonium', 'Milton\'s capital of Hell.'], ['Delirium', 'A state of mind.']] },
+    { id: 'typeface', pool: 'words', words: true, q: 'a typeface', nn: 'Not a typeface.',
+      yes: [['Helvetica', 'Swiss, 1957.'], ['Futura', 'Paul Renner, 1927.'], ['Garamond', 'Named for a Paris punchcutter of the 1500s.'], ['Baskerville', 'John Baskerville, Birmingham, the 1750s.'],
+            ['Bodoni', 'Giambattista Bodoni, of Parma.'], ['Gill Sans', 'Eric Gill, 1928.'], ['Comic Sans', 'It is one, like it or not.'], ['Times New Roman', 'Made for The Times of London.'],
+            ['Courier', 'The typewriter one.'], ['Verdana', 'Matthew Carter, for screens, 1996.'], ['Georgia', 'A state, a country, and a Matthew Carter typeface.'], ['Palatino', 'Hermann Zapf.'],
+            ['Didot', 'A Paris family of printers. Think fashion mastheads.'], ['Rockwell', 'A slab serif from 1934.'], ['Papyrus', 'The Avatar logo, famously.'], ['Impact', 'The meme one.'],
+            ['Chicago', 'Susan Kare\'s system font for the first Macintosh.'], ['Geneva', 'One of the original Macintosh fonts.'], ['Monaco', 'Apple\'s old monospaced font.'],
+            ['Tahoma', 'Matthew Carter, for Microsoft.'], ['Arial', 'Monotype\'s stand-in for Helvetica.'], ['Wingdings', 'All pictures, but a typeface.'], ['Optima', 'Hermann Zapf, 1958.'],
+            ['Frutiger', 'Drawn for the signs at Charles de Gaulle airport.'], ['Univers', 'Adrian Frutiger, 1957.'], ['Akzidenz-Grotesk', 'Berlin, 1898. An ancestor of Helvetica.'],
+            ['Caslon', 'The first printing of the Declaration of Independence was set in it.'], ['Franklin Gothic', 'Morris Fuller Benton, early 1900s.']],
+      no: [['Veranda', 'A porch. The typeface is Verdana.'], ['Ariel', 'A sprite in The Tempest, or a mermaid. The typeface is Arial.'], ['Tacoma', 'A city in Washington. The typeface is Tahoma.'],
+           ['Helvetia', 'The Latin name for Switzerland. The typeface is Helvetica.'], ['Pantone', 'A colour-matching system.'], ['Magenta', 'A colour: the M in CMYK.'],
+           ['Kerning', 'The spacing between two letters.'], ['Leading', 'The space between lines.'], ['Serif', 'The little feet on some letters.'], ['Ligature', 'Two letters joined into one.'],
+           ['Lorem Ipsum', 'Placeholder text.'], ['Letterpress', 'A way of printing.'], ['Risograph', 'A printing machine.'], ['Linotype', 'A typesetting machine, and the company that made it.'],
+           ['Bézier', 'A kind of curve. Letters are drawn with them.'], ['Colophon', 'The note at the back of a book saying how it was made.'], ['Ampersand', 'The & sign.'],
+           ['Pilcrow', 'The paragraph mark.'], ['Octothorpe', 'The # sign.'], ['Majuscule', 'A capital letter.'], ['Vellum', 'Fine parchment.'], ['Moleskine', 'A notebook.'], ['Sharpie', 'A marker.'],
+           ['Vignelli', 'A designer, famous for getting by on a handful of typefaces.'], ['Paul Rand', 'A designer: the IBM logo, among others.'], ['Saul Bass', 'A designer of film titles and logos.'],
+           ['Dieter Rams', 'A designer of radios and shelves.']] },
     { id: 'prime', pool: 'words', words: true, num: true, q: 'a prime number', yn: 'Divisible by 1 and itself, and nothing else.',
       yes: [53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149].map(String),
       no: [1, 9, 15, 21, 25, 27, 33, 35, 39, 45, 49, 51, 55, 57, 63, 65, 69, 75, 77, 81, 85, 87, 91, 93, 95, 99, 111, 117, 119, 121, 123, 129, 133, 141, 143, 147, 153, 161, 169, 187].map(String) }
@@ -1178,6 +1402,9 @@ p{margin:0}
     sound.buzz(); vibrate(60);
     const tape = $('nope'); tape.textContent = s ? s.t : 'Nope';
     if (wrongEnds) { stopReel(); lateTakeover('Wrong slide', 'wrong'); return; }
+    // a long name gets smaller lettering, so the whole of it fits on the tape
+    tape.style.fontSize = '';
+    for (let z = 0.94; z > 0.6 && tape.scrollWidth > tape.clientWidth + 1; z -= 0.06) tape.style.fontSize = `calc(12px * var(--z-label) * ${z.toFixed(2)})`;
     // freeze the reel with the slide's name on it, then carry on from where it stopped
     const b = $('well'), cap = $('early');
     b.classList.remove('early'); void b.offsetWidth; b.classList.add('early');
