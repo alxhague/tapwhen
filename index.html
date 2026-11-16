@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tap When</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#ddd1b8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tap When">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" data-face="anybody" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&family=Martian+Mono:wdth,wght@75..112.5,100..800&display=swap">
+<style>
+/* Layout: the same apparatus as Perfect Timing, with a slide viewer bolted on. One big red button in a black housing,
+   on a panel whose enamel changes every round: teal, mustard, sky, brown, avocado, putty. Above it a viewer in the same
+   black housing shows 35mm slides (3:2), one after another. What to wait for is printed on the panel; anything the
+   machine has to tell you is punched onto black label tape. A result comes out as a paper slip with the slide on it.
+   A win lights the table green, a quick draw is a red-and-cream target, a miss is solid red. Sheets you read are paper. */
+:root{
+  --red:#e1261c; --red-edge:#9b130c; --red-dim:#8c1912;   /* the button: always red */
+  --cream:#fbf3e1;                    /* the legend on the button, the letters on label tape */
+  --paper:#f6efde; --ink:#221c17;     /* the result slip, title slides, and the sheets you read */
+  --tape:#1b1714; --collar:#1b1714;   /* label tape; the housing the button and the viewer sit in */
+  --ground:#ddd1b8; --fg:#221c17;     /* the finish in force: panel colour and legend colour (every screen sets its own) */
+  --side:#5d5751;                     /* the edge of a key: its face colour, a step away */
+  /* type by role (the script sets these from FACES) */
+  --f-head:'Anybody','Arial Black','Helvetica Neue',Arial,sans-serif; --w-head:900; --s-head:150%;    /* nameplates */
+  --f-key:'Anybody','Arial Black','Helvetica Neue',Arial,sans-serif; --w-key:800; --s-key:118%; --t-key:.03em;   /* legends on keys */
+  --f-shout:'Anybody','Arial Black','Helvetica Neue',Arial,sans-serif; --w-shout:900; --s-shout:100%; /* the takeovers */
+  --f-ask:'Anybody','Helvetica Neue',Arial,sans-serif; --w-ask:700; --s-ask:94%;                      /* what to wait for, and anything said out loud */
+  --f-num:'Anybody','Arial Narrow','Helvetica Neue',Arial,sans-serif; --w-num:800; --s-num:68%;       /* every number */
+  --f-label:'Martian Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace; --w-label:600; --s-label:100%; --t-label:.1em;   /* label tape, small legends */
+  --f-text:'Martian Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace; --w-text:400; --s-text:80%;      /* anything read */
+  --z-head:1; --z-key:1; --z-ask:1; --z-label:1; --z-text:1; --z-legend:1;   /* per-face size trims */
+  --dw:.5em; --cw:.22em;              /* digit and point cells, measured by the script in the face in force */
+  --ease:cubic-bezier(.3,0,.15,1);
+  --spring:cubic-bezier(.2,1.5,.4,1);
+  color-scheme:light;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{background:var(--ground);box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--fg);font-family:var(--f-text);font-weight:var(--w-text);font-stretch:var(--s-text);overflow:hidden;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;
+  -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit}
+p{margin:0}
+[hidden]{display:none!important}
+#stage{position:relative;width:100%;height:100%;overflow:hidden;touch-action:manipulation}
+
+/* ---------- type, by role ---------- */
+.mark,.overlay h2{font-family:var(--f-head);font-weight:var(--w-head);font-stretch:var(--s-head);text-transform:uppercase;letter-spacing:0}
+.pill,.cbtn,.legend{font-family:var(--f-key);font-weight:var(--w-key);font-stretch:var(--s-key);letter-spacing:var(--t-key);text-transform:uppercase}
+.word{font-family:var(--f-shout);font-weight:var(--w-shout);font-stretch:var(--s-shout);text-transform:uppercase;letter-spacing:0}
+.question,.title2,.tapline,.opt .t,.steps b{font-family:var(--f-ask);font-weight:var(--w-ask);font-stretch:var(--s-ask)}
+.readout,.rowb .total,.steps li::before,.lnum{font-family:var(--f-num);font-weight:var(--w-num);font-stretch:var(--s-num);letter-spacing:0}
+.eyebrow,.tape,.chip{font-family:var(--f-label);font-weight:var(--w-label);font-stretch:var(--s-label);letter-spacing:var(--t-label);text-transform:uppercase}
+
+.eyebrow{font-size:calc(12px*var(--z-label));line-height:1.45;text-wrap:balance}
+.dim{opacity:.7}
+.mark{font-size:56px;line-height:.95;margin:0;text-align:center}
+.title2{font-size:calc(var(--z-ask)*clamp(24px,7vmin,40px));line-height:1.08;text-wrap:balance}
+.question{font-size:calc(var(--z-ask)*clamp(25px,7.6vw,44px));line-height:1.08;text-wrap:balance;overflow-wrap:anywhere}
+
+/* ---------- label tape: what the machine has to say ---------- */
+.tape,.chip{display:inline-flex;align-items:center;flex:0 0 auto;border-radius:3px;background:var(--tape);color:var(--cream);line-height:1;white-space:nowrap;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(0,0,0,.5),0 1px 2px rgba(0,0,0,.28)}
+.tape{height:28px;padding:0 calc(10px - var(--t-label)) 0 10px;font-size:calc(12px*var(--z-label))}
+.tape.red{background:var(--red)}
+.tape.lg{height:42px;padding:0 calc(17px - var(--t-label)) 0 17px;border-radius:4px;font-size:calc(15px*var(--z-label))}
+.scores{display:flex;flex-wrap:wrap;gap:6px;flex:0 0 auto}
+.chip{gap:7px;height:30px;padding:0 calc(11px - var(--t-label)) 0 7px;font-size:calc(13px*var(--z-label))}
+.chip .e{font-size:16px;line-height:1;letter-spacing:0}
+
+/* ---------- keys: caps in the legend colour, with an edge; or a flat outline for the ones you rarely want ---------- */
+.pill{font-size:calc(16px*var(--z-key));line-height:1;height:52px;padding:0 24px;margin:0 0 5px;border:0;border-radius:12px;flex:0 0 auto;
+  background:var(--fg);color:var(--ground);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  box-shadow:0 5px 0 var(--side);transition:transform .07s ease,box-shadow .07s ease}
+.pill:active{transform:translateY(4px);box-shadow:0 1px 0 var(--side)}
+.pill.ghost{background:transparent;color:var(--fg);box-shadow:inset 0 0 0 2px var(--fg);margin-bottom:0;transition:transform .15s var(--spring)}
+.pill.ghost:active{transform:scale(.96);box-shadow:inset 0 0 0 2px var(--fg)}
+.pill.small{height:42px;padding:0 18px;border-radius:10px;font-size:calc(13px*var(--z-key))}
+.pill.armed,.pill.ghost.armed{background:var(--red);color:var(--cream);box-shadow:none}
+.pill:focus-visible,.cbtn:focus-visible,.big:focus-visible,.opt:focus-visible,.pbtn:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+/* ---------- corner furniture: the round on a strip of tape, and the round keys ---------- */
+#corner{position:absolute;left:max(20px,env(safe-area-inset-left,0px));top:24px;z-index:5;pointer-events:none}
+#corner:empty{display:none}
+#ctrl{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:16px;z-index:5;display:flex;gap:10px}
+.cbtn{width:44px;height:44px;padding:0;margin:0 0 4px;border:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;touch-action:manipulation;
+  background:var(--fg);color:var(--ground);font-size:19px;line-height:1;letter-spacing:0;
+  box-shadow:0 4px 0 var(--side);transition:transform .07s ease,box-shadow .07s ease;-webkit-tap-highlight-color:transparent}
+.cbtn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--side)}
+
+/* ---------- screens: each is a full panel in its own finish, and arrives as a disc growing from where you tapped ---------- */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--ground);color:var(--fg);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-block:76px 18px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.screen>.col{width:min(560px,100%);margin-inline:auto;display:flex;flex-direction:column;flex:0 0 auto;gap:24px}
+.screen>.col.fill{flex:1 1 auto;min-height:0;gap:12px}
+.screen>.col.center{flex:1 0 auto;justify-content:center;align-items:center;text-align:center;gap:24px;padding-bottom:54px}
+#screen-start>.col{gap:clamp(28px,6vh,52px)}
+#screen-round{overflow:hidden}
+.wipe{animation:wipe .5s var(--ease) both}
+@keyframes wipe{from{clip-path:circle(0% at var(--ox,50%) var(--oy,50%))}to{clip-path:circle(142% at var(--ox,50%) var(--oy,50%))}}
+@keyframes unwipe{from{clip-path:circle(142% at var(--ox,50%) var(--oy,50%))}to{clip-path:circle(0% at var(--ox,50%) var(--oy,50%))}}
+
+/* ---------- what to wait for ---------- */
+.ask{display:flex;flex-direction:column;gap:3px;flex:0 0 auto}
+
+/* ---------- the viewer: a window in the same black housing as the button. Slides are 3:2 and arrive with a clack ---------- */
+.bay{flex:1 1 0;min-height:92px;display:grid;place-items:center;container-type:size;padding-top:8px}
+.viewer{--b:9px;position:relative;flex:0 0 auto;width:min(100%,58vh);padding:var(--b);border-radius:calc(var(--b) + 9px);background:var(--collar);
+  box-shadow:inset 0 3px 0 rgba(0,0,0,.5),0 2px 0 rgba(255,255,255,.18),0 10px 18px -8px rgba(0,0,0,.4)}
+@supports (width:1cqw){.viewer{width:min(100cqw,calc((100cqh - 8px - 2*var(--b))*1.5 + 2*var(--b)))}}
+.viewer>.tape{position:absolute;left:14px;top:-10px;transform:rotate(-2deg);z-index:3}
+.win{position:relative;aspect-ratio:3/2;border-radius:9px;overflow:hidden;background:#0c0b0a;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+#slide,#slide>*,.leader{position:absolute;inset:0;width:100%;height:100%}
+#slide img{display:block;object-fit:cover;pointer-events:none;-webkit-user-drag:none}
+.clack{animation:clack .16s linear}
+@keyframes clack{0%{filter:brightness(.15);transform:translateY(-2.5%)}45%{filter:brightness(.7);transform:translateY(.6%)}100%{filter:none;transform:none}}
+/* a title slide: type on paper, for rounds that are names or numbers */
+.card{display:grid;place-items:center;text-align:center;background:var(--paper);color:var(--ink);padding:6% 7%;
+  box-shadow:inset 0 0 0 7px var(--paper),inset 0 0 0 8px rgba(34,28,23,.3)}
+.card span{display:block;font-family:var(--f-head);font-weight:var(--w-head);font-stretch:112%;text-transform:uppercase;line-height:.98;text-wrap:balance;max-width:100%}
+.card.num span{font-family:var(--f-num);font-weight:var(--w-num);font-stretch:var(--s-num);line-height:.9}
+.card.end{background:#2a2521;color:var(--cream);box-shadow:none}
+.card.end span{font-family:var(--f-label);font-weight:var(--w-label);font-stretch:100%;letter-spacing:var(--t-label);opacity:.6}
+/* the film leader: three, two, one */
+@property --a{syntax:'<angle>';inherits:false;initial-value:0deg}
+.leader{display:grid;place-items:center;color:var(--cream);z-index:2;
+  background:linear-gradient(var(--cream),var(--cream)) 50% 50%/1px 100% no-repeat,linear-gradient(var(--cream),var(--cream)) 50% 50%/100% 1px no-repeat,#2a2521}
+.leader::before,.leader::after{content:"";position:absolute;left:50%;top:50%;height:84%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%}
+.leader::before{box-shadow:inset 0 0 0 2px var(--cream)}
+.leader.run::after{background:conic-gradient(rgba(251,243,225,.3) var(--a),transparent 0);animation:sweep var(--step,.62s) linear}
+@keyframes sweep{to{--a:360deg}}
+.lnum{position:relative;z-index:1;line-height:1;font-size:60px}
+.leader.wait::before{display:none}
+.leader.wait{background:#2a2521}
+.leader.wait .lnum{font-family:var(--f-label);font-weight:var(--w-label);font-stretch:100%;letter-spacing:var(--t-label);text-transform:uppercase;font-size:12px!important;opacity:.7}
+/* a wrong tap: the slide's name on red tape, and the window rimmed in red */
+#nope{position:absolute;left:9px;bottom:9px;z-index:4;max-width:calc(100% - 18px);overflow:hidden;text-overflow:ellipsis;
+  transform:translateY(160%) rotate(-2deg);opacity:0;transition:transform .26s var(--spring),opacity .1s}
+#nope.show{transform:rotate(-2deg);opacity:1}
+.win.wrong{box-shadow:inset 0 0 0 4px var(--red)}
+.win.wrong #slide{filter:saturate(.35) brightness(.8)}
+
+/* ---------- the button: a red cap standing proud of a black housing, with a bezel of ticks; it goes down when you hit it ---------- */
+.arena{flex:0 0 auto;display:flex;align-items:center;justify-content:center;position:relative;padding-block:8px 2px}
+.well{--d:clamp(96px,19vh,176px);
+  --c:max(10px,calc(var(--d)*.062));       /* how thick the housing is */
+  --lift:max(8px,calc(var(--d)*.042));     /* how far the cap stands out of it */
+  position:relative;flex:0 0 auto;width:calc(var(--d) + 2*var(--c));height:calc(var(--d) + 2*var(--c));border-radius:50%;background:var(--collar);display:grid;place-items:center;
+  box-shadow:inset 0 3px 0 rgba(0,0,0,.5),0 2px 0 rgba(255,255,255,.18),0 10px 18px -8px rgba(0,0,0,.4)}
+.well.play{--d:min(60vw,34vh,280px)}
+.rig{position:relative;flex:0 0 auto}
+.well::before,.well::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none}
+.well::before{opacity:.4;background:repeating-conic-gradient(from -.5deg,var(--cream) 0 1deg,transparent 1deg 6deg);
+  -webkit-mask:radial-gradient(closest-side,transparent calc(100% - var(--c)*.62),#000 calc(100% - var(--c)*.62 + .5px) calc(100% - var(--c)*.24),transparent calc(100% - var(--c)*.24 + .5px));
+  mask:radial-gradient(closest-side,transparent calc(100% - var(--c)*.62),#000 calc(100% - var(--c)*.62 + .5px) calc(100% - var(--c)*.24),transparent calc(100% - var(--c)*.24 + .5px))}
+.well::after{opacity:.92;background:repeating-conic-gradient(from -1deg,var(--cream) 0 2deg,transparent 2deg 30deg);
+  -webkit-mask:radial-gradient(closest-side,transparent calc(100% - var(--c)*.74),#000 calc(100% - var(--c)*.74 + .5px) calc(100% - var(--c)*.24),transparent calc(100% - var(--c)*.24 + .5px));
+  mask:radial-gradient(closest-side,transparent calc(100% - var(--c)*.74),#000 calc(100% - var(--c)*.74 + .5px) calc(100% - var(--c)*.24),transparent calc(100% - var(--c)*.24 + .5px))}
+.big{position:relative;z-index:1;width:var(--d);height:var(--d);border-radius:50%;border:0;padding:0;margin:0;background:var(--red);color:var(--cream);display:grid;place-items:center;
+  cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transform:translateY(calc(var(--lift)*-1));
+  box-shadow:0 var(--lift) 0 var(--red-edge),0 calc(var(--lift) + 6px) 12px rgba(0,0,0,.55),inset 0 3px 0 rgba(255,255,255,.26),inset 0 -7px 0 rgba(0,0,0,.07);
+  transition:transform .06s ease,box-shadow .06s ease,background .1s}
+.big.down,.big:active{transform:translateY(-2px);box-shadow:0 2px 0 var(--red-edge),0 4px 6px rgba(0,0,0,.55),inset 0 3px 0 rgba(255,255,255,.18),inset 0 -7px 0 rgba(0,0,0,.07)}
+.well.early{animation:shake .45s linear}
+.well.early .big{background:var(--red-dim)}
+.legend{font-size:calc(var(--d)*.19*var(--z-legend));line-height:1}
+#early{position:absolute;top:0;left:50%;z-index:2;pointer-events:none;
+  transform:translate(-50%,-70%) rotate(-3deg) scale(.6);opacity:0;transition:transform .28s var(--spring),opacity .1s}
+#early.show{transform:translate(-50%,-10%) rotate(-3deg) scale(1);opacity:1}
+.under{flex:0 0 auto;min-height:42px}
+@keyframes shake{10%,90%{transform:translate(-2px,1px)}20%,80%{transform:translate(4px,-2px)}30%,50%,70%{transform:translate(-7px,3px)}40%,60%{transform:translate(7px,-3px)}}
+
+/* ---------- the review: the machine prints a slip. The slide, what it was, how fast you were, then the note ---------- */
+.slip{--ground:var(--paper);--fg:var(--ink);position:relative;display:flex;flex-direction:column;gap:12px;padding:30px 18px 18px;margin:8px 0 6px;
+  background:var(--paper);color:var(--ink);border-radius:4px 4px 0 0;filter:drop-shadow(0 9px 9px rgba(0,0,0,.26));animation:feed .5s .1s var(--ease) both}
+.slip::after{content:"";position:absolute;left:0;right:0;top:100%;height:7px;     /* the torn edge */
+  background:linear-gradient(135deg,var(--paper) 50%,transparent 50.5%) 0 0/12px 7px repeat-x,linear-gradient(225deg,var(--paper) 50%,transparent 50.5%) 0 0/12px 7px repeat-x}
+.slip>.tape{position:absolute;top:-10px;left:14px;transform:rotate(-2deg)}
+@keyframes feed{from{transform:translateY(26px);opacity:0}}
+.found{display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);column-gap:14px;align-items:center}
+.found.words{grid-template-columns:minmax(0,1fr)}
+.found .title2{font-size:calc(var(--z-ask)*clamp(19px,5.6vmin,32px))}
+.found.words .title2{font-size:calc(var(--z-ask)*clamp(26px,8vmin,44px))}
+.shot{display:block;width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:5px;background:#0c0b0a;pointer-events:none}
+.answer{display:flex;flex-direction:column;align-items:flex-start;gap:9px}
+.readout{display:flex;align-items:baseline;gap:.055em;white-space:nowrap;font-size:96px;line-height:1}
+.readout b{font-weight:inherit;display:inline-block;text-align:center}
+.readout b.d{width:calc(var(--dw) + .2em);padding:.1em 0 .07em;border-radius:.09em;background:var(--fg);color:var(--ground)}
+.readout b.c{width:max(var(--cw),.28em);margin-inline:-.03em}
+.tapline{font-size:calc(19px*var(--z-ask));line-height:1.2}
+.note{font-size:calc(14.5px*var(--z-text));line-height:1.55;text-wrap:pretty}
+.falses{display:flex;flex-direction:column;gap:6px;padding-top:12px;border-top:1px solid rgba(34,28,23,.28)}
+.falses ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.falses li{font-size:calc(13.5px*var(--z-text));line-height:1.5;text-wrap:pretty}
+.falses li b{font-family:var(--f-ask);font-weight:var(--w-ask);font-stretch:var(--s-ask);font-size:calc(15.5px*var(--z-ask))}
+/* the bottom half of the review: the scoreboard, in the round's colours turned inside out. Faces with their scores; tap the one who got it */
+#screen-result>.col{flex:1 0 auto;gap:20px}
+.bench{--ground:var(--inv-ground);--fg:var(--inv-fg);--side:var(--inv-side);flex:1 0 auto;display:flex;flex-direction:column;gap:16px;padding:18px 18px 20px;border-radius:20px;background:var(--ground);color:var(--fg)}
+.bench>.pill{align-self:flex-start;margin-top:auto}
+.who{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start}
+.who .pill{height:92px;padding:0 18px;border-radius:16px}
+.pbtn{width:72px;height:92px;padding:6px 0 0;margin:0 0 5px;border:0;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;touch-action:manipulation;
+  background:var(--fg);color:var(--ground);box-shadow:0 5px 0 var(--side);transition:transform .07s ease,box-shadow .07s ease;-webkit-tap-highlight-color:transparent}
+.pbtn .e{font-size:40px;line-height:1}
+.pbtn b{font-family:var(--f-num);font-weight:var(--w-num);font-stretch:var(--s-num);font-size:24px;line-height:1}
+.pbtn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--side)}
+.pbtn:disabled{cursor:default;transform:none;background:transparent;color:var(--fg);box-shadow:inset 0 0 0 2px var(--fg);margin-bottom:0}
+/* handing someone their avatar */
+.plate{display:flex;align-items:center;gap:16px;animation:enter .45s var(--spring) both}
+.plate .e{font-size:clamp(84px,26vw,120px);line-height:1;flex:0 0 auto}
+.plate .t{font-family:var(--f-ask);font-weight:var(--w-ask);font-stretch:var(--s-ask);font-size:calc(var(--z-ask)*clamp(22px,6.4vw,30px));line-height:1.1;text-wrap:balance}
+.plate .d{font-size:calc(13px*var(--z-text));line-height:1.5;opacity:.8;margin-top:6px}
+
+/* ---------- final scores ---------- */
+#screen-end>.col{margin-block:auto}
+#endStats{display:flex;flex-direction:column;gap:5px}
+.champ{font-size:clamp(84px,28vmin,170px);line-height:1}
+.board{width:100%;display:flex;flex-direction:column}
+.rowb{display:grid;grid-template-columns:auto 1fr auto;align-items:center;column-gap:14px;padding:8px 2px;
+  border-top:1px solid rgba(128,128,128,.4);border-top:1px solid color-mix(in srgb,currentColor 28%,transparent)}
+.rowb:last-child{border-bottom:1px solid rgba(128,128,128,.4);border-bottom:1px solid color-mix(in srgb,currentColor 28%,transparent)}
+.rowb .e{font-size:34px;line-height:1}
+.rowb .total{font-size:clamp(36px,10.5vmin,64px);line-height:1;text-align:right;min-width:1.2em}
+
+/* ---------- takeovers: a lamp the size of the table, growing from the button ---------- */
+.takeover{position:absolute;inset:0;z-index:30;display:grid;place-items:center;overflow:hidden;background:var(--ground);color:var(--fg);cursor:pointer;
+  padding:env(safe-area-inset-top,0px) max(20px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(20px,env(safe-area-inset-left,0px));
+  animation:wipe .45s var(--ease) both}
+.takeover.out{animation:unwipe .42s var(--ease) both;pointer-events:none}
+.takeover canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#late{--ground:var(--red);--fg:var(--cream)}
+.tk{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;width:min(600px,100%)}
+.word{font-size:72px;line-height:.94;text-wrap:balance;animation:enter .5s .12s var(--spring) both}
+.tk .answer{align-items:center;animation:enter .5s .22s var(--spring) both}
+#celeChip{animation:enter .5s .3s var(--spring) both,nudge 1.1s .85s ease-in-out infinite}
+.ring{display:none}
+#cele.bull .word{animation:slam .6s .1s var(--spring) both}
+#cele.bull .tk{animation:shake .5s .34s linear}
+#cele.bull .ring{display:block;position:absolute;left:50%;top:50%;width:44vmin;height:44vmin;margin:-22vmin 0 0 -22vmin;border-radius:50%;
+  box-shadow:inset 0 0 0 9px var(--fg);pointer-events:none;animation:ringout 1.15s var(--ease) both}
+#cele.bull .ring.r2{animation-delay:.2s}
+#cele.bull .ring.r3{animation-delay:.4s}
+#late .word{animation:slam .5s var(--spring) both}
+@keyframes enter{from{transform:scale(.55);opacity:0}}
+@keyframes slam{from{transform:scale(3.2);opacity:0}}
+@keyframes nudge{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+@keyframes ringout{from{transform:scale(.2);opacity:.85}to{transform:scale(3.6);opacity:0}}
+
+/* ---------- sheets to read: rules, settings and credits on paper; pause with the lights off ---------- */
+.overlay{--ground:var(--paper);--fg:var(--ink);--side:#5d5751;position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;
+  background:var(--ground);color:var(--fg);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-block:min(84px,14vh) 40px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));
+  animation:wipe .45s var(--ease) both}
+#pause{--ground:var(--ink);--fg:var(--paper);--side:#aca697;z-index:24}
+#credits{z-index:22}
+.overlay>.col{margin:0 auto;width:min(480px,100%);display:flex;flex-direction:column;gap:28px;text-align:left;flex:0 0 auto}
+.overlay>.col.center{margin:auto;align-items:center;text-align:center}
+.overlay .x{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:16px}
+.overlay h2{margin:0;font-size:calc(var(--z-head)*clamp(24px,7vw,40px));line-height:1;text-wrap:balance}
+.overlay>.col>.pill{align-self:flex-start}
+.overlay>.col.center>.pill{align-self:center}
+.stack{display:flex;flex-direction:column;gap:14px;width:min(280px,100%)}
+.stack .pill{width:100%}
+.group{display:flex;flex-direction:column;gap:10px}
+.group>.pill{align-self:flex-start}
+.hint{font-size:calc(13.5px*var(--z-text));line-height:1.55;opacity:.76;text-wrap:pretty;-webkit-user-select:text;user-select:text}
+.hint a{color:inherit}
+
+.opts{display:flex;flex-direction:column}
+.opt{width:100%;display:grid;grid-template-columns:1fr auto;column-gap:18px;align-items:center;text-align:left;cursor:pointer;touch-action:manipulation;
+  background:transparent;color:var(--fg);border:0;border-radius:0;margin:0;padding:14px 0;-webkit-tap-highlight-color:transparent;
+  border-top:1px solid rgba(128,128,128,.4);border-top:1px solid color-mix(in srgb,currentColor 28%,transparent)}
+.opt:last-child{border-bottom:1px solid rgba(128,128,128,.4);border-bottom:1px solid color-mix(in srgb,currentColor 28%,transparent)}
+.opt:active{opacity:.55}
+.opt .t{grid-column:1;font-size:calc(20px*var(--z-ask));line-height:1.2}
+.opt .d{grid-column:1;font-size:calc(13.5px*var(--z-text));line-height:1.5;opacity:.76;margin-top:4px}
+/* each choice has a lamp: lit red when it's the one in force */
+.opt::after{content:"";grid-column:2;grid-row:1/span 2;width:22px;height:22px;border-radius:50%;background:rgba(128,128,128,.3);background:color-mix(in srgb,var(--fg) 16%,transparent);box-shadow:inset 0 2px 0 rgba(0,0,0,.22)}
+.opt.on::after{background:var(--red);box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 0 0 4px rgba(225,38,28,.22)}
+
+.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column}
+.steps li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;align-items:baseline;padding:12px 0;
+  border-top:1px solid rgba(128,128,128,.4);border-top:1px solid color-mix(in srgb,currentColor 28%,transparent)}
+.steps li:last-child{border-bottom:1px solid rgba(128,128,128,.4);border-bottom:1px solid color-mix(in srgb,currentColor 28%,transparent)}
+.steps li::before{content:counter(s);font-size:28px;line-height:1;grid-row:1/span 2}
+.steps b{grid-column:2;font-size:calc(17px*var(--z-ask));line-height:1.25}
+.steps span{grid-column:2;font-size:calc(13.5px*var(--z-text));line-height:1.55;opacity:.8;margin-top:3px}
+.creds{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;font-size:calc(12.5px*var(--z-text));line-height:1.5;-webkit-user-select:text;user-select:text}
+.creds b{font-weight:600}
+
+/* a phone on its side: the viewer sits beside the button rather than above it */
+@media (orientation:landscape) and (max-height:540px){
+  .screen{padding-block:66px 12px}
+  #screen-start>.col.center{flex-direction:row;gap:clamp(28px,6vw,64px);padding-bottom:0}
+  .well.play{--d:min(30vw,50vh,280px)}
+  #screen-round>.col.fill{display:grid;grid-template-columns:minmax(0,1fr) min(32%,calc(100vh - 96px));grid-template-rows:auto auto minmax(0,1fr) auto;column-gap:26px;row-gap:8px;width:min(980px,100%)}
+  #screen-round .scores{grid-column:1;grid-row:1}
+  #screen-round .ask{grid-column:1;grid-row:2}
+  #screen-round .question{font-size:calc(var(--z-ask)*clamp(20px,7vh,34px))}
+  #screen-round .bay{grid-column:1;grid-row:3/5;min-height:0}
+  #screen-round .arena{grid-column:2;grid-row:1/4;align-self:center}
+  #screen-round .under{grid-column:2;grid-row:4}
+  #screen-round .well{--d:min(24vw,44vh,220px)}
+}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="tape" id="corner"></div>
+  <div id="ctrl">
+    <button class="cbtn" id="pauseBtn" type="button" aria-label="Pause" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="6.2" y="5" width="3.6" height="14" rx="1"/><rect x="14.2" y="5" width="3.6" height="14" rx="1"/></svg></button>
+    <button class="cbtn" id="settingsBtn" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 8h8.5M19.5 8h.5M4 16h.5M11.5 16H20" fill="none"/><circle cx="16" cy="8" r="2.6" fill="none"/><circle cx="8" cy="16" r="2.6" fill="none"/></svg></button>
+    <button class="cbtn" id="helpBtn" type="button" aria-label="How to play">?</button>
+  </div>
+
+  <!-- TITLE -->
+  <section class="screen" id="screen-start">
+    <div class="col center">
+      <h1 class="mark">Tap<br>When</h1>
+      <div class="rig"><div class="well play"><button class="big" id="playBtn" type="button"><span class="legend">Play</span></button></div></div>
+    </div>
+  </section>
+
+  <!-- ROUND -->
+  <section class="screen" id="screen-round" hidden>
+    <div class="col fill">
+      <div class="scores" hidden></div>
+      <div class="ask">
+        <div class="eyebrow">Tap when you see</div>
+        <p class="question" id="qText"></p>
+      </div>
+      <div class="bay">
+        <div class="viewer">
+          <div class="tape" id="slideNo">Reel</div>
+          <div class="win" id="win">
+            <div id="slide"></div>
+            <div class="leader" id="leader" hidden><span class="lnum" id="leadNum">3</span></div>
+            <div class="tape red" id="nope" aria-live="assertive"></div>
+          </div>
+        </div>
+      </div>
+      <div class="arena">
+        <div class="tape lg red" id="early">Nope</div>
+        <div class="well" id="well"><button class="big" id="bigBtn" type="button" aria-label="Tap when you see it"><span class="legend" id="legend"></span></button></div>
+      </div>
+      <div class="row under"><button class="pill ghost small" id="skipBtn" type="button">Skip it</button><button class="pill ghost small" id="giveUp" type="button" hidden>Everyone's out</button></div>
+    </div>
+  </section>
+
+  <!-- REVIEW -->
+  <section class="screen" id="screen-result" hidden>
+    <div class="col">
+      <div class="slip" id="slip">
+        <div class="tape" id="resEyebrow">Correct</div>
+        <div class="found" id="resFound">
+          <img class="shot" id="resShot" alt="">
+          <span class="title2" id="resName"></span>
+        </div>
+        <p class="tapline" id="resTapped"></p>
+        <p class="note" id="resNote"></p>
+        <div class="falses" id="resFalse" hidden><div class="eyebrow" id="resFalseLabel">Wrong taps</div><ul id="resFalseList"></ul></div>
+      </div>
+      <div class="bench">
+        <div class="eyebrow" id="whoLabel">Who got it?</div>
+        <div class="who" id="who"></div>
+        <div class="plate" id="plate" hidden>
+          <span class="e" id="plateEmoji">🦊</span>
+          <div><div class="t" id="plateTitle">Whoever got that, this is you.</div><div class="d">Your avatar for the game. Next time you win a round, tap your own face.</div></div>
+        </div>
+        <button class="pill" id="nextBtn" type="button" hidden>Next round</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL -->
+  <section class="screen" id="screen-end" hidden>
+    <div class="col" style="align-items:center;text-align:center">
+      <div class="tape red" id="endEyebrow">Winner</div>
+      <div class="champ" id="endHero">🦊</div>
+      <div class="title2" id="endLine"></div>
+      <div class="board" id="rank"></div>
+      <div class="eyebrow dim" id="endStats"></div>
+      <div class="row">
+        <button class="pill" id="againBtn" type="button">Play again</button>
+        <button class="pill ghost" id="homeBtn" type="button">Home</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAKEOVERS -->
+  <div class="takeover" id="cele" hidden>
+    <canvas id="confetti" aria-hidden="true"></canvas>
+    <div class="ring"></div><div class="ring r2"></div><div class="ring r3"></div>
+    <div class="tk">
+      <div class="eyebrow" id="celeEyebrow">Round 1 of 10</div>
+      <div class="word" id="celeTitle">You got it!</div>
+      <div class="answer"><span class="readout" id="celeNum">0.84</span><span class="eyebrow" id="celeUnit">seconds</span></div>
+      <div class="tape lg" id="celeChip" hidden>Double points</div>
+      <div class="eyebrow dim" id="celeSub"></div>
+    </div>
+  </div>
+  <div class="takeover" id="late" hidden>
+    <div class="tk"><div class="word" id="lateWord">Missed it</div></div>
+  </div>
+
+  <!-- SHEETS -->
+  <div class="overlay" id="rules" hidden>
+    <button class="cbtn x" type="button" data-close="rules" aria-label="Close"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none"/></svg></button>
+    <div class="col">
+      <h2>How to play</h2>
+      <ol class="steps">
+        <li><b>Read what to wait for.</b><span>Each round names one thing: a carnivore, a landmark in France, an EGOT winner.</span></li>
+        <li><b id="rule2b">Watch the slides.</b><span id="rule2">After a three, two, one, a new slide comes up every two seconds. Nearly all of them are not it.</span></li>
+        <li><b>Hit the button when you see one.</b><span>The right slide can be the very first, or take half a minute to turn up. First hand on the button while it's showing wins the round.</span></li>
+        <li><b>Quick draw.</b><span>Hit it inside eight tenths of a second and the round is worth double.</span></li>
+        <li><b>Wrong slide?</b><span id="rule5">The button buzzes and the tape says what you hit. You sit out the rest of the round.</span></li>
+        <li><b>It doesn't wait.</b><span>The right slide stays up exactly as long as the others. If it goes by untapped, nobody scores.</span></li>
+        <li><b>Win.</b><span>Winners get an emoji. Most points after ten rounds takes it.</span></li>
+      </ol>
+      <button class="pill" type="button" data-close="rules">Got it</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="settings" hidden>
+    <button class="cbtn x" type="button" data-close="settings" aria-label="Close"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none"/></svg></button>
+    <div class="col">
+      <h2>Settings</h2>
+      <div class="group">
+        <div class="eyebrow">Pace</div>
+        <div class="opts">
+          <button class="opt" id="paceBrisk" type="button"><span class="t">Brisk</span><span class="d">A new slide every 1.3 seconds.</span></button>
+          <button class="opt" id="paceSteady" type="button"><span class="t">Steady</span><span class="d">A new slide every 2 seconds.</span></button>
+          <button class="opt" id="paceSlow" type="button"><span class="t">Slow</span><span class="d">A new slide every 3 seconds.</span></button>
+        </div>
+      </div>
+      <div class="group">
+        <div class="eyebrow">A wrong tap</div>
+        <div class="opts">
+          <button class="opt" id="wrongOut" type="button"><span class="t">Sits you out</span><span class="d">The reel stops for a second, then carries on for everyone else.</span></button>
+          <button class="opt" id="wrongEnd" type="button"><span class="t">Ends the round</span><span class="d">One wrong tap and nobody scores.</span></button>
+        </div>
+      </div>
+      <div class="group">
+        <div class="eyebrow">Rounds</div>
+        <div class="opts">
+          <button class="opt" id="mixAll" type="button"><span class="t">Photos and words</span><span class="d">Eight photo rounds and two of names or numbers.</span></button>
+          <button class="opt" id="mixPhotos" type="button"><span class="t">Photos only</span><span class="d">Animals, landmarks, planets and flags.</span></button>
+        </div>
+      </div>
+      <div class="group">
+        <div class="eyebrow">Slides start</div>
+        <div class="opts">
+          <button class="opt" id="startAuto" type="button"><span class="t">Right away</span><span class="d">Three, two, one, and the first slide is up.</span></button>
+          <button class="opt" id="startTap" type="button"><span class="t">On tap</span><span class="d">Read first. The reel waits for someone to tap Start.</span></button>
+        </div>
+      </div>
+      <div class="group">
+        <div class="eyebrow">Sound</div>
+        <div class="opts">
+          <button class="opt" id="sndOn" type="button"><span class="t">On</span></button>
+          <button class="opt" id="sndOff" type="button"><span class="t">Off</span></button>
+        </div>
+      </div>
+      <div class="group">
+        <div class="eyebrow">Typeface · trying a few</div>
+        <div class="opts" id="faceOpts"></div>
+      </div>
+      <div class="group">
+        <div class="eyebrow">The reels</div>
+        <p class="hint" id="settingsDeckInfo"></p>
+        <button class="pill ghost" id="creditsBtn" type="button">Photo credits</button>
+      </div>
+      <button class="pill" type="button" data-close="settings">Done</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="credits" hidden>
+    <button class="cbtn x" type="button" data-close="credits" aria-label="Close"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none"/></svg></button>
+    <div class="col">
+      <h2>Photo credits</h2>
+      <p class="hint">Stand-in photos for the prototype, all openly licensed. Each one has been cropped and resized to fit a slide.</p>
+      <p class="hint">Animal, landmark and planet photos come from GCompris, the KDE educational suite (gcompris.net), which is published under GPL-3.0-or-later. The package records these individual credits:</p>
+      <ul class="creds" id="credList"></ul>
+      <p class="hint">Flags are from flag-icons by Panayiotis Lipiridis (MIT licence).</p>
+      <button class="pill" type="button" data-close="credits">Done</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="pause" hidden>
+    <div class="col center">
+      <h2>Paused</h2>
+      <div class="eyebrow" id="pauseTitle">Round 3 of 10</div>
+      <div class="stack">
+        <button class="pill" id="resumeBtn" type="button">Resume</button>
+        <button class="pill ghost" id="quitBtn" type="button">Quit game</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ───────────── the rules, as numbers ─────────────
+  const ROUNDS = 10;
+  const MAX_WAIT = 30;          // seconds: the longest the right slide can take to come up. It can also be the very first.
+  const PACES = { brisk: 1.3, steady: 2, slow: 3 };   // seconds a slide stays up
+  const GRACE_MS = 250;         // a tap this soon after a slide change was aimed at the slide before it
+  const QUICK_SECS = 0.8;       // spot it this fast and the round is worth double
+  const NOPE_HOLD_MS = 1100;    // a wrong tap freezes the reel this long, with the slide's name on tape
+  const AFTER_MS = 800;         // the slide after the right one gets this long before the round is called
+  const LEAD_STEP_MS = 620;     // each beat of the three, two, one
+  const LATE_SHOW_MS = 1200;    // how long "Missed it" holds the screen
+  const START_LOCK_MS = 150;
+  const MIX = { all: { animals: 3, landmarks: 3, planets: 1, flags: 1, words: 2 }, photos: { animals: 4, landmarks: 3, planets: 1, flags: 2, words: 0 } };
+
+  // ───────────── the slides: what each photo is called when the machine names it ─────────────
+  const NAMES = {
+    alpaca: 'Alpaca', bee: 'Honeybee', butterfly: 'Butterfly', calf: 'Calf', camels: 'Bactrian camels', caterpillar: 'Caterpillar', chameleon: 'Chameleon',
+    cheetah: 'Cheetah', crab: 'Crab', dolphin: 'Dolphin', flyingfox: 'Flying fox', gibbon: 'Gibbon', giraffe: 'Giraffe', goat: 'Goat', gorilla: 'Gorilla',
+    gosling: 'Gosling', heron: 'Heron', horse: 'Horse', kingfisher: 'Kingfisher', kitten: 'Kitten', proboscis: 'Proboscis monkey', macaque: 'Macaque',
+    meerkats: 'Meerkats', harrier: 'Northern harrier', ibex: 'Nubian ibex', penguin: 'Penguin', pika: 'Pika', redpanda: 'Red panda', rhino: 'Indian rhinoceros',
+    spoonbills: 'Spoonbills', squirrel: 'Red squirrel', swans: 'Swans', aracari: 'Aracari', bison: 'Bison', crocodile: 'Crocodile', komodo: 'Komodo dragon',
+    hedgehog: 'Hedgehog', jaguar: 'Jaguars', koala: 'Koala', lemur: 'Ring-tailed lemurs', moose: 'Moose', narwhal: 'Narwhals', panda: 'Giant panda',
+    polarbear: 'Polar bear', macaw: 'Scarlet macaw', chickens: 'Chickens', cow: 'Cow', dog: 'German shepherd', duck: 'Duck', owl: 'Owl', sheep: 'Sheep',
+    chichen: 'Chichén Itzá, Mexico', redeemer: 'Christ the Redeemer, Rio de Janeiro', colosseum: 'The Colosseum, Rome', greatwall: 'The Great Wall of China',
+    machu: 'Machu Picchu, Peru', petra: 'Petra, Jordan', taj: 'The Taj Mahal, India', bent: 'The Bent Pyramid, Egypt', gizapyr: 'The Great Pyramid of Giza',
+    meidum: 'Meidum Pyramid, Egypt', redpyr: 'The Red Pyramid, Egypt', giza3: 'The Pyramids of Giza', arles: 'Arles Amphitheatre, France',
+    chambord: 'Château de Chambord, France', chenonceau: 'Château de Chenonceau, France', carcassonne: 'Carcassonne, France', eiffel: 'The Eiffel Tower, Paris',
+    montstmichel: 'Mont-Saint-Michel, France', papes: 'Palais des Papes, Avignon', pontdugard: 'Pont du Gard, France', reims: 'Reims Cathedral, France',
+    notredame: 'Notre-Dame de Paris', louvre: 'The Louvre, Paris', berlindom: 'Berlin Cathedral', brandenburg: 'Brandenburg Gate, Berlin',
+    neuschwanstein: 'Neuschwanstein Castle, Germany', schwerin: 'Schwerin Palace, Germany', trierbaths: 'Imperial Baths, Trier', worms: 'Worms Cathedral, Germany',
+    sanmarcos: 'Castillo de San Marcos, Florida', sumter: 'Fort Sumter, South Carolina', lincoln: 'The Lincoln Memorial, Washington', rushmore: 'Mount Rushmore, South Dakota',
+    liberty: 'The Statue of Liberty, New York', empire: 'The Empire State Building, New York', capitol: 'The U.S. Capitol, Washington', charminar: 'Charminar, Hyderabad',
+    gateway: 'Gateway of India, Mumbai', golden: 'The Golden Temple, Amritsar', stupa: 'The Great Stupa at Sanchi, India', hawa: 'Hawa Mahal, Jaipur',
+    konark: 'Konark Sun Temple, India', mysore: 'Mysore Palace, India', qutub: 'Qutub Minar, Delhi', victoria: 'Victoria Memorial, Kolkata', nagoya: 'Nagoya Castle, Japan',
+    opera: 'Sydney Opera House', towerbridge: 'Tower Bridge, London', egeskov: 'Egeskov Castle, Denmark', eilean: 'Eilean Donan Castle, Scotland',
+    pisa: 'The Leaning Tower of Pisa', parthenon: 'The Parthenon, Athens', domerock: 'Dome of the Rock, Jerusalem', winter: 'The Winter Palace, St Petersburg',
+    mercury: 'Mercury', venus: 'Venus', earth: 'Earth', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune', sun: 'The Sun',
+    'flag-au': 'Australia', 'flag-nz': 'New Zealand', 'flag-fj': 'Fiji', 'flag-tv': 'Tuvalu', 'flag-us': 'United States', 'flag-lr': 'Liberia', 'flag-my': 'Malaysia',
+    'flag-ws': 'Samoa', 'flag-to': 'Tonga', 'flag-no': 'Norway', 'flag-is': 'Iceland', 'flag-dk': 'Denmark', 'flag-gr': 'Greece', 'flag-do': 'Dominican Republic',
+    'flag-cu': 'Cuba', 'flag-cl': 'Chile', 'flag-ge': 'Georgia', 'flag-ch': 'Switzerland', 'flag-pa': 'Panama', 'flag-cr': 'Costa Rica', 'flag-th': 'Thailand',
+    'flag-fr': 'France', 'flag-nl': 'Netherlands', 'flag-ru': 'Russia', 'flag-ca': 'Canada', 'flag-in': 'India', 'flag-za': 'South Africa', 'flag-jm': 'Jamaica',
+    'flag-ar': 'Argentina', 'flag-br': 'Brazil', 'flag-co': 'Colombia', 'flag-ec': 'Ecuador', 'flag-pe': 'Peru', 'flag-uy': 'Uruguay', 'flag-ve': 'Venezuela',
+    'flag-bo': 'Bolivia', 'flag-py': 'Paraguay', 'flag-mx': 'Mexico', 'flag-hn': 'Honduras', 'flag-gt': 'Guatemala', 'flag-es': 'Spain', 'flag-pt': 'Portugal',
+    'flag-it': 'Italy', 'flag-ie': 'Ireland', 'flag-ro': 'Romania', 'flag-lt': 'Lithuania', 'flag-et': 'Ethiopia', 'flag-gh': 'Ghana', 'flag-ph': 'Philippines',
+    'flag-ng': 'Nigeria', 'flag-ke': 'Kenya', 'flag-eg': 'Egypt', 'flag-ma': 'Morocco', 'flag-sn': 'Senegal', 'flag-tz': 'Tanzania', 'flag-dz': 'Algeria',
+    'flag-gy': 'Guyana', 'flag-sr': 'Suriname', 'flag-pk': 'Pakistan', 'flag-sa': 'Saudi Arabia', 'flag-tr': 'Turkey', 'flag-id': 'Indonesia', 'flag-ye': 'Yemen',
+    'flag-hu': 'Hungary', 'flag-se': 'Sweden', 'flag-fi': 'Finland'
+  };
+
+  // ───────────── the reels ─────────────
+  // Each reel is one thing to wait for. `yes` are the slides that count, `no` the ones that don't. An entry is a slide id
+  // (a file in img/), or [id, 'a line for the slip'] when there is something worth saying: why it counts, or why it fooled you.
+  // `yn` / `nn` are the lines used when an entry has none. Word reels (`words: true`) flash names or numbers instead of photos.
+  // `x` marks reels too alike to both turn up in one game.
+  const F = (list) => list.split(' ').map(c => 'flag-' + c);
+  const REELS = [
+    // ---- animals
+    { id: 'carnivore', pool: 'animals', q: 'a carnivore', nn: 'A plant-eater.',
+      yes: [['cheetah', 'Meat and nothing else: mostly small antelope.'], ['jaguar', 'A top predator. Meat only.'], ['crocodile', 'Fish, birds, mammals. Never a salad.'],
+            ['komodo', 'It eats deer, pigs and the odd water buffalo.'], ['polarbear', 'The most carnivorous of the bears: mostly seals.'], ['owl', 'Mice, voles and small birds.'],
+            ['harrier', 'A hawk. It hunts mice and voles.'], ['dolphin', 'Fish and squid.']],
+      no: [['panda', 'It belongs to the order Carnivora and eats almost nothing but bamboo.'], ['koala', 'Eucalyptus leaves, and little else.'], ['gorilla', 'Leaves, stems and fruit.'],
+           ['flyingfox', 'A fruit bat: nectar and fruit.'], 'alpaca', 'calf', 'camels', 'giraffe', 'goat', 'horse', 'ibex', 'rhino', 'bison', 'moose', 'sheep', 'cow', 'pika', 'caterpillar', 'gosling'] },
+    { id: 'primate', pool: 'animals', x: 'primates', q: 'a primate', nn: 'Not a primate.',
+      yes: [['gibbon', 'An ape, in fact.'], ['gorilla', 'A great ape.'], ['proboscis', 'A proboscis monkey, from Borneo.'], ['macaque', 'A macaque: an Old World monkey.'],
+            ['lemur', 'Lemurs are primates too. They live only in Madagascar.']],
+      no: [['redpanda', 'Not a primate. Its closest relatives are raccoons and weasels.'], ['koala', 'A marsupial.'], ['meerkats', 'Mongooses.'], ['squirrel', 'A rodent.'], ['flyingfox', 'A bat.'],
+           ['pika', 'A relative of rabbits.'], ['panda', 'A bear.'], 'hedgehog', 'kitten', 'alpaca', 'polarbear', 'cheetah', 'moose', 'bison', 'dog', 'sheep'] },
+    { id: 'ape', pool: 'animals', x: 'primates', q: 'an ape', nn: 'Not an ape.',
+      yes: [['gibbon', 'Gibbons are the lesser apes. No tail.'], ['gorilla', 'The largest of the great apes.']],
+      no: [['proboscis', 'A monkey. Apes have no tails.'], ['macaque', 'A monkey, not an ape.'], ['lemur', 'A primate, but not an ape.'],
+           'redpanda', 'koala', 'meerkats', 'squirrel', 'flyingfox', 'hedgehog', 'pika', 'panda', 'polarbear', 'kitten', 'dog', 'sheep', 'alpaca'] },
+    { id: 'bear', pool: 'animals', q: 'a bear', nn: 'Not a bear.',
+      yes: [['polarbear', 'The largest bear there is.'], ['panda', 'Giant pandas are true bears.']],
+      no: [['koala', 'Not a bear. Koalas are marsupials.'], ['redpanda', 'Not a bear, and not a close relative of the giant panda.'],
+           'bison', 'gorilla', 'moose', 'alpaca', 'dog', 'meerkats', 'hedgehog', 'proboscis', 'macaque', 'squirrel', 'sheep', 'cow', 'goat', 'horse', 'pika', 'lemur'] },
+    { id: 'canfly', pool: 'animals', q: 'something that can fly', yn: 'Airborne.', nn: 'Grounded.',
+      yes: ['bee', 'butterfly', ['flyingfox', 'Bats are the only mammals that truly fly.'], 'heron', 'kingfisher', 'harrier', 'spoonbills',
+            ['swans', 'Among the heaviest birds that fly.'], 'aracari', 'macaw', 'owl'],
+      no: [['penguin', 'It only flies underwater.'], ['caterpillar', 'Not yet. Give it a few weeks.'], ['squirrel', 'It jumps. It does not fly.'],
+           'giraffe', 'crab', 'dolphin', 'lemur', 'gibbon', 'crocodile', 'komodo', 'hedgehog', 'alpaca', 'horse', 'cheetah', 'koala', 'moose', 'polarbear', 'kitten', 'chameleon'] },
+    { id: 'mammal', pool: 'animals', q: 'a mammal', yn: 'A mammal.',
+      yes: [['dolphin', 'Warm-blooded, breathes air, nurses its young.'], ['narwhal', 'A whale, so a mammal. The tusk is a tooth.'], ['flyingfox', 'Bats are mammals.'], 'hedgehog', 'redpanda'],
+      no: [['penguin', 'A bird.'], ['heron', 'A bird.'], ['kingfisher', 'A bird.'], ['harrier', 'A bird.'], ['spoonbills', 'Birds.'], ['swans', 'Birds.'], ['aracari', 'A bird.'],
+           ['macaw', 'A bird.'], ['owl', 'A bird.'], ['duck', 'A bird.'], ['chickens', 'Birds.'], ['gosling', 'A bird.'], ['bee', 'An insect.'], ['butterfly', 'An insect.'],
+           ['caterpillar', 'An insect.'], ['crab', 'A crustacean.'], ['chameleon', 'A reptile.'], ['crocodile', 'A reptile.'], ['komodo', 'A reptile.']] },
+    { id: 'africa', pool: 'animals', q: 'an animal native to Africa', nn: 'Not from Africa.',
+      yes: ['cheetah', 'giraffe', ['gorilla', 'Central Africa.'], ['meerkats', 'Southern Africa.'], ['lemur', 'Madagascar, which is part of Africa.'], ['ibex', 'Northeast Africa and Arabia.']],
+      no: [['jaguar', 'The Americas. Africa has leopards.'], ['rhino', 'One horn and armour plating: this rhino is from India and Nepal.'], ['komodo', 'Indonesia.'],
+           ['proboscis', 'Borneo.'], ['gibbon', 'Southeast Asia.'], 'koala', 'panda', 'redpanda', 'polarbear', 'bison', 'moose', 'alpaca', 'aracari', 'macaw', 'narwhal', 'pika'] },
+    { id: 'samerica', pool: 'animals', q: 'an animal native to South America', nn: 'Not from South America.',
+      yes: [['alpaca', 'The Andes.'], ['jaguar', 'From Mexico down to Argentina.'], ['macaw', 'Scarlet macaws range from Mexico to the Amazon.']],
+      no: [['camels', 'Central Asia. Alpacas are the American cousins.'], ['cheetah', 'Africa. South America\'s big cat is the jaguar.'], ['bison', 'North America.'],
+           ['moose', 'The far north.'], 'koala', 'giraffe', 'gorilla', 'lemur', 'panda', 'redpanda', 'polarbear', 'komodo', 'proboscis', 'gibbon', 'ibex', 'rhino', 'narwhal', 'pika', 'hedgehog', 'meerkats'] },
+    { id: 'reptile', pool: 'animals', q: 'a reptile', nn: 'Not a reptile.',
+      yes: ['chameleon', 'crocodile', ['komodo', 'The largest lizard alive.']],
+      no: [['caterpillar', 'An insect.'], ['crab', 'A crustacean.'], ['dolphin', 'A mammal.'], ['narwhal', 'A mammal.'], ['penguin', 'A bird.'],
+           'hedgehog', 'pika', 'flyingfox', 'heron', 'kingfisher', 'bee', 'butterfly', 'squirrel', 'alpaca', 'giraffe', 'koala', 'kitten', 'gosling'] },
+    // ---- landmarks
+    { id: 'france', pool: 'landmarks', q: 'a landmark in France',
+      yes: ['eiffel', 'montstmichel', 'chambord', 'chenonceau', 'carcassonne', 'pontdugard', 'notredame', 'louvre'],
+      no: [['schwerin', 'Germany, though it would look at home on the Loire.'], ['liberty', 'A gift from France. It stands in New York Harbor.'],
+           ['redeemer', 'Rio. The sculptor was French, though.'], ['neuschwanstein', 'Bavaria.'], ['egeskov', 'Denmark.'], ['eilean', 'Scotland.'], ['worms', 'Germany.'],
+           'colosseum', 'berlindom', 'brandenburg', 'towerbridge', 'taj', 'lincoln', 'greatwall', 'petra', 'machu', 'chichen', 'gizapyr', 'pisa', 'parthenon', 'nagoya', 'opera', 'golden', 'hawa'] },
+    { id: 'usa', pool: 'landmarks', q: 'a landmark in the United States',
+      yes: ['liberty', 'rushmore', 'lincoln', 'empire', 'capitol'],
+      no: [['redeemer', 'Brazil.'], ['chichen', 'Mexico.'], ['machu', 'Peru.'], ['brandenburg', 'Berlin.'], ['parthenon', 'Athens.'], ['victoria', 'Kolkata, India.'],
+           ['winter', 'St Petersburg, the Russian one.'], 'berlindom', 'towerbridge', 'eiffel', 'opera', 'colosseum', 'taj', 'greatwall', 'petra', 'pisa', 'neuschwanstein', 'gateway',
+           'louvre', 'gizapyr', 'montstmichel', 'nagoya'] },
+    { id: 'india', pool: 'landmarks', x: 'asia', q: 'a landmark in India',
+      yes: ['taj', 'golden', 'hawa', 'gateway', 'qutub', 'charminar', 'mysore', 'victoria', 'stupa', 'konark'],
+      no: [['petra', 'Jordan.'], ['domerock', 'Jerusalem.'], 'greatwall', 'nagoya', 'chichen', 'gizapyr', 'berlindom', 'brandenburg', 'schwerin', 'colosseum', 'machu', 'redeemer', 'eiffel',
+           'liberty', 'opera', 'towerbridge', 'winter', 'capitol', 'pisa', 'louvre', 'carcassonne'] },
+    { id: 'asia', pool: 'landmarks', x: 'asia', q: 'a landmark in Asia',
+      yes: ['greatwall', 'taj', ['petra', 'Jordan is in Western Asia.'], 'golden', 'hawa', 'nagoya', 'domerock', 'qutub', 'gateway'],
+      no: [['gizapyr', 'Egypt: Africa.'], ['opera', 'Australia.'], ['parthenon', 'Athens: Europe.'], ['winter', 'St Petersburg is in European Russia.'],
+           'chichen', 'machu', 'redeemer', 'colosseum', 'eiffel', 'liberty', 'towerbridge', 'neuschwanstein', 'montstmichel', 'brandenburg', 'pisa', 'rushmore', 'lincoln', 'capitol',
+           'berlindom', 'schwerin', 'egeskov', 'notredame'] },
+    { id: 'wonders', pool: 'landmarks', q: 'one of the New Seven Wonders of the World', yn: 'Voted in, in 2007.',
+      yes: ['chichen', 'redeemer', 'colosseum', 'greatwall', 'machu', 'petra', 'taj'],
+      no: [['gizapyr', 'The one ancient wonder still standing. It was given honorary status instead.'], ['eiffel', 'A finalist in 2007. It missed the cut.'],
+           ['liberty', 'A finalist in 2007. It missed the cut.'], ['neuschwanstein', 'A finalist in 2007. It missed the cut.'], ['opera', 'A finalist in 2007. It missed the cut.'],
+           ['parthenon', 'The Acropolis was a finalist in 2007. It missed the cut.'], 'montstmichel', 'lincoln', 'rushmore', 'brandenburg', 'golden', 'hawa', 'towerbridge', 'notredame',
+           'louvre', 'qutub', 'pisa', 'empire', 'capitol', 'nagoya', 'carcassonne', 'chambord'] },
+    { id: 'romans', pool: 'landmarks', q: 'something the Romans built',
+      yes: [['colosseum', 'Finished in AD 80.'], ['pontdugard', 'A first-century aqueduct.'], ['arles', 'The amphitheatre at Arles, about AD 90.'], ['trierbaths', 'The Imperial Baths at Trier, fourth century.']],
+      no: [['parthenon', 'Greek, and about 500 years older than the Colosseum.'], ['brandenburg', 'Prussian, 1791.'], ['lincoln', 'American, 1922. It only looks ancient.'],
+           ['petra', 'Carved by the Nabataeans.'], ['pisa', 'Medieval. Begun in 1173.'], ['sanmarcos', 'Spanish, 1695.'], ['gizapyr', 'Egyptian, and older than Rome itself.'],
+           'reims', 'notredame', 'berlindom', 'worms', 'montstmichel', 'papes', 'sumter', 'taj', 'machu', 'greatwall', 'chichen', 'neuschwanstein', 'towerbridge', 'capitol', 'chambord', 'eilean'] },
+    { id: 'pyramid', pool: 'landmarks', q: 'an Egyptian pyramid',
+      yes: ['gizapyr', ['bent', 'The Bent Pyramid at Dahshur.'], ['redpyr', 'The Red Pyramid at Dahshur.'], ['meidum', 'The collapsed pyramid at Meidum.'], 'giza3'],
+      no: [['chichen', 'A Maya pyramid, in Mexico.'], ['louvre', 'A glass one, in Paris.'], ['stupa', 'A Buddhist stupa, in India.'],
+           'machu', 'petra', 'taj', 'colosseum', 'greatwall', 'konark', 'qutub', 'rushmore', 'montstmichel', 'eiffel', 'empire', 'pisa', 'sumter', 'hawa', 'capitol'] },
+    { id: 'c1900', pool: 'landmarks', q: 'something built in the 1900s',
+      yes: [['redeemer', 'Finished in 1931.'], ['lincoln', 'Dedicated in 1922.'], ['rushmore', 'Carved from 1927 to 1941.'], ['opera', 'Opened in 1973.'], ['gateway', 'Finished in 1924.'],
+            ['victoria', 'Finished in 1921.'], ['empire', 'Opened in 1931.']],
+      no: [['eiffel', '1889. Just missed.'], ['liberty', '1886.'], ['neuschwanstein', 'It looks medieval. It went up in the 1870s and 80s.'], ['towerbridge', '1894.'], ['brandenburg', '1791.'],
+           ['schwerin', '1857.'], ['hawa', '1799.'], ['taj', 'The 1600s.'], ['colosseum', 'AD 80.'], ['machu', 'About 1450.'], ['notredame', 'Finished in 1345.'], ['chambord', 'The 1500s.'],
+           ['charminar', '1591.'], ['qutub', 'About 1200.'], ['pisa', 'Finished in 1372.'], ['parthenon', '432 BC.'], ['capitol', 'The 1800s.'], ['winter', '1762.'], ['egeskov', '1554.'],
+           'gizapyr', 'greatwall', 'petra', 'chichen', 'montstmichel'] },
+    // ---- planets
+    { id: 'bigger', pool: 'planets', x: 'planets', q: 'a planet bigger than Earth',
+      yes: [['jupiter', 'Eleven Earths wide.'], ['saturn', 'Nine Earths wide, not counting the rings.'], ['uranus', 'Four Earths wide.'], ['neptune', 'Nearly four Earths wide.']],
+      no: [['venus', 'Close. About 95% of Earth\'s width.'], ['mars', 'About half Earth\'s width.'], ['mercury', 'The smallest planet.'], ['earth', 'Exactly the same size as Earth.'],
+           ['sun', 'Much bigger, but it is a star.']] },
+    { id: 'rocky', pool: 'planets', x: 'planets', q: 'a rocky planet', yn: 'One of the four rocky planets.',
+      yes: ['mercury', 'venus', 'earth', 'mars'],
+      no: [['jupiter', 'A gas giant.'], ['saturn', 'A gas giant.'], ['uranus', 'An ice giant.'], ['neptune', 'An ice giant.'], ['sun', 'A star.']] },
+    // ---- flags
+    { id: 'unionjack', pool: 'flags', q: 'a flag with the Union Jack on it',
+      yes: F('au nz fj tv'), no: F('us lr my ws to no is dk gr do cu cl ge ch pa cr th fr nl ru ca in za jm') },
+    { id: 'nordic', pool: 'flags', q: 'a Nordic cross',
+      yes: F('dk se no fi is'),
+      no: [['flag-ch', 'A cross, but a centred one.'], ['flag-jm', 'A saltire.']].concat(F('gr ge to do us fr nl ru th cr ca tr pk id au nz cu pa')) },
+    { id: 'samflag', pool: 'flags', q: 'the flag of a South American country',
+      yes: F('ar br cl co ec pe uy ve bo py'),
+      no: [['flag-mx', 'North America.'], ['flag-cu', 'The Caribbean.'], ['flag-cr', 'Central America.'], ['flag-pa', 'Central America.']].concat(F('hn gt es pt it ie ro lt et gh ph jm do')) },
+    { id: 'afflag', pool: 'flags', q: 'the flag of an African country',
+      yes: F('ng ke za eg gh et ma sn tz dz'),
+      no: [['flag-jm', 'The Caribbean.'], ['flag-bo', 'South America.'], ['flag-gy', 'South America.'], ['flag-sr', 'South America.'], ['flag-lt', 'Europe.'],
+           ['flag-ye', 'Arabia. Egypt\'s has an eagle in the middle.']].concat(F('in ie it br mx pk sa tr id hu')) },
+    // ---- words: names and numbers on title slides
+    { id: 'egot', pool: 'words', words: true, q: 'an EGOT winner',
+      yes: [['Mel Brooks', 'Completed the set in 2001 with Tonys for The Producers.'], ['Whoopi Goldberg', 'Completed the set in 2002 with a Tony as a producer of Thoroughly Modern Millie.'],
+            ['Audrey Hepburn', 'Completed the set in 1994, after her death, with a spoken-word Grammy.'], ['John Legend', 'Completed the set in 2018 with an Emmy for Jesus Christ Superstar Live.'],
+            ['Viola Davis', 'Completed the set in 2023 with a Grammy for reading her own memoir.'], ['Jennifer Hudson', 'Completed the set in 2022 with a Tony as a producer of A Strange Loop.'],
+            ['Elton John', 'Completed the set in 2024 with an Emmy for his farewell concert special.'], ['Rita Moreno', 'Completed the set in 1977 with an Emmy for The Muppet Show.'],
+            ['Andrew Lloyd Webber', 'Completed the set in 2018 with an Emmy for Jesus Christ Superstar Live.'], ['Steven Spielberg', 'Completed the set in 2026 with a Grammy for Music by John Williams.'],
+            ['Alan Menken', 'Completed the set in 2020 with a Daytime Emmy.'], ['Tim Rice', 'Completed the set in 2018 with an Emmy for Jesus Christ Superstar Live.'],
+            ['Mike Nichols', 'Completed the set in 2001 with Emmys for Wit.'], ['Robert Lopez', 'Completed the set in 2014 with an Oscar for Let It Go, then did it all again.']],
+      no: [['Lin-Manuel Miranda', 'Emmy, Grammy, Tony. No Oscar.'], ['Barbra Streisand', 'She has all four statues, but her Tony was a special award, not a competitive win.'],
+           ['Cher', 'Emmy, Grammy, Oscar. No Tony.'], ['Kate Winslet', 'Emmy, Grammy, Oscar. No Tony.'], ['Julie Andrews', 'Emmy, Grammy, Oscar. No competitive Tony.'],
+           ['Hugh Jackman', 'No Oscar.'], ['Stephen Sondheim', 'Grammy, Oscar, Tony. No Emmy.'], ['Quincy Jones', 'His Oscars were honorary ones.'],
+           ['Liza Minnelli', 'Her Grammy was a non-competitive Legend Award.'], ['Meryl Streep', 'Oscars and Emmys. No Grammy, no Tony.'], ['Tom Hanks', 'Oscars and Emmys. No Grammy, no Tony.'],
+           ['Beyoncé', 'Grammys by the dozen, and none of the other three.'], ['Taylor Swift', 'Grammys and an Emmy.'], ['Lady Gaga', 'Grammys and an Oscar. No Tony.'],
+           ['Oprah Winfrey', 'No Grammy, and her Oscar is an honorary one.'], ['Denzel Washington', 'Oscars and a Tony.'], ['Adele', 'Emmy, Grammy, Oscar. No Tony.'],
+           ['Paul McCartney', 'Emmy, Grammy, Oscar. No Tony.'], ['Bette Midler', 'Emmy, Grammy, Tony. No Oscar.'], ['Cynthia Erivo', 'Emmy, Grammy, Tony. No Oscar.'],
+           ['Common', 'Emmy, Grammy, Oscar. No Tony.'], ['Helen Mirren', 'Emmy, Oscar, Tony. No Grammy.'], ['Al Pacino', 'Emmy, Oscar, Tony. No Grammy.']] },
+    { id: 'capital', pool: 'words', words: true, q: 'a U.S. state capital',
+      yes: [['Albany', 'New York.'], ['Sacramento', 'California.'], ['Tallahassee', 'Florida.'], ['Springfield', 'Illinois.'], ['Olympia', 'Washington.'], ['Harrisburg', 'Pennsylvania.'],
+            ['Lansing', 'Michigan.'], ['Baton Rouge', 'Louisiana.'], ['Carson City', 'Nevada.'], ['Austin', 'Texas.'], ['Juneau', 'Alaska.'], ['Montpelier', 'Vermont.'], ['Annapolis', 'Maryland.'],
+            ['Jefferson City', 'Missouri.'], ['Frankfort', 'Kentucky.'], ['Pierre', 'South Dakota.'], ['Bismarck', 'North Dakota.'], ['Helena', 'Montana.'], ['Salem', 'Oregon.'],
+            ['Trenton', 'New Jersey.'], ['Madison', 'Wisconsin.'], ['Santa Fe', 'New Mexico.'], ['Augusta', 'Maine.'], ['Concord', 'New Hampshire.'], ['Dover', 'Delaware.'],
+            ['Topeka', 'Kansas.'], ['Lincoln', 'Nebraska.'], ['Cheyenne', 'Wyoming.']],
+      no: [['New York City', 'New York\'s capital is Albany.'], ['Los Angeles', 'California\'s capital is Sacramento.'], ['Chicago', 'Illinois\'s capital is Springfield.'],
+           ['Houston', 'Texas\'s capital is Austin.'], ['Philadelphia', 'Pennsylvania\'s capital is Harrisburg.'], ['Miami', 'Florida\'s capital is Tallahassee.'],
+           ['Seattle', 'Washington\'s capital is Olympia.'], ['Las Vegas', 'Nevada\'s capital is Carson City.'], ['Detroit', 'Michigan\'s capital is Lansing.'],
+           ['New Orleans', 'Louisiana\'s capital is Baton Rouge.'], ['Portland', 'Oregon\'s capital is Salem. Maine\'s is Augusta.'], ['San Francisco', 'California\'s capital is Sacramento.'],
+           ['Dallas', 'Texas\'s capital is Austin.'], ['Baltimore', 'Maryland\'s capital is Annapolis.'], ['Milwaukee', 'Wisconsin\'s capital is Madison.'],
+           ['Anchorage', 'Alaska\'s capital is Juneau.'], ['Louisville', 'Kentucky\'s capital is Frankfort.'], ['Kansas City', 'Missouri\'s capital is Jefferson City. Kansas\'s is Topeka.'],
+           ['Omaha', 'Nebraska\'s capital is Lincoln.'], ['Charlotte', 'North Carolina\'s capital is Raleigh.'], ['Newark', 'New Jersey\'s capital is Trenton.'],
+           ['Burlington', 'Vermont\'s capital is Montpelier.'], ['Wilmington', 'Delaware\'s capital is Dover.'], ['Billings', 'Montana\'s capital is Helena.'],
+           ['Sioux Falls', 'South Dakota\'s capital is Pierre.'], ['Fargo', 'North Dakota\'s capital is Bismarck.'], ['Albuquerque', 'New Mexico\'s capital is Santa Fe.'],
+           ['Birmingham', 'Alabama\'s capital is Montgomery.'], ['Memphis', 'Tennessee\'s capital is Nashville.'], ['St. Louis', 'Missouri\'s capital is Jefferson City.'],
+           ['Cleveland', 'Ohio\'s capital is Columbus.'], ['Pittsburgh', 'Pennsylvania\'s capital is Harrisburg.'], ['Orlando', 'Florida\'s capital is Tallahassee.'],
+           ['San Diego', 'California\'s capital is Sacramento.'], ['Tucson', 'Arizona\'s capital is Phoenix.'], ['Reno', 'Nevada\'s capital is Carson City.']] },
+    { id: 'shakespeare', pool: 'words', words: true, q: 'a Shakespeare play', yn: 'One of his.',
+      yes: ['Hamlet', 'Macbeth', 'Othello', 'King Lear', 'The Tempest', 'Twelfth Night', 'Coriolanus', 'Cymbeline', 'Timon of Athens', 'Titus Andronicus', 'Troilus and Cressida',
+            'The Winter\'s Tale', 'Measure for Measure', 'As You Like It', 'Much Ado About Nothing', 'The Comedy of Errors', 'Love\'s Labour\'s Lost', 'Richard III', 'Henry V',
+            'Julius Caesar', 'Antony and Cleopatra', 'The Merchant of Venice'],
+      no: [['Doctor Faustus', 'Christopher Marlowe.'], ['Tamburlaine', 'Christopher Marlowe.'], ['The Jew of Malta', 'Christopher Marlowe. Shakespeare\'s is The Merchant of Venice.'],
+           ['Edward II', 'Christopher Marlowe. Shakespeare wrote a Richard II.'], ['Volpone', 'Ben Jonson.'], ['The Alchemist', 'Ben Jonson.'], ['The Duchess of Malfi', 'John Webster.'],
+           ['The Spanish Tragedy', 'Thomas Kyd.'], ['Oedipus Rex', 'Sophocles.'], ['Antigone', 'Sophocles.'], ['Medea', 'Euripides.'], ['Tartuffe', 'Molière.'], ['Faust', 'Goethe.'],
+           ['The Importance of Being Earnest', 'Oscar Wilde.'], ['Pygmalion', 'George Bernard Shaw.'], ['A Doll\'s House', 'Henrik Ibsen.'], ['Hedda Gabler', 'Henrik Ibsen.'],
+           ['The Cherry Orchard', 'Anton Chekhov.'], ['Waiting for Godot', 'Samuel Beckett.'], ['Rosencrantz and Guildenstern Are Dead', 'Tom Stoppard, borrowing two of Hamlet\'s friends.'],
+           ['West Side Story', 'Romeo and Juliet set to music, but not his.'], ['Kiss Me, Kate', 'Cole Porter, riffing on The Taming of the Shrew.'], ['The School for Scandal', 'Richard Brinsley Sheridan.'],
+           ['She Stoops to Conquer', 'Oliver Goldsmith.'], ['Paradise Lost', 'John Milton, and a poem.'], ['The Canterbury Tales', 'Geoffrey Chaucer, two centuries earlier.'],
+           ['Cyrano de Bergerac', 'Edmond Rostand.'], ['Don Quixote', 'Cervantes, and a novel.']] },
+    { id: 'prime', pool: 'words', words: true, num: true, q: 'a prime number', yn: 'Divisible by 1 and itself, and nothing else.',
+      yes: [53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149].map(String),
+      no: [1, 9, 15, 21, 25, 27, 33, 35, 39, 45, 49, 51, 55, 57, 63, 65, 69, 75, 77, 81, 85, 87, 91, 93, 95, 99, 111, 117, 119, 121, 123, 129, 133, 141, 143, 147, 153, 161, 169, 187].map(String) }
+  ];
+  const factorLine = (n) => { if (n < 2) return 'A prime has exactly two divisors. 1 has one.'; for (let p = 2; p * p <= n; p++) if (n % p === 0) return n + ' = ' + p + ' × ' + (n / p) + '.'; return ''; };
+  // every entry becomes { k: key, t: what to call it, n: the line for the slip, img: is it a photo }
+  for (const r of REELS) {
+    const norm = (e, dflt) => { const k = Array.isArray(e) ? e[0] : e; let n = Array.isArray(e) ? e[1] : '';
+      if (!n && r.num && dflt === r.nn) n = factorLine(Number(k));
+      return { k, t: r.words ? k : (NAMES[k] || k), n: n || dflt || '', img: !r.words }; };
+    r.yes = r.yes.map(e => norm(e, r.yn)); r.no = r.no.map(e => norm(e, r.nn));
+  }
+
+  // what the package's copyright file records for individual photos: [slide, author, licence]
+  const CREDITS = [['crocodile', 'Kmanoj', 'CC BY 3.0'], ['komodo', 'Raul654', 'CC BY-SA 3.0'], ['koala', 'David Iliff', 'CC BY-SA 3.0'], ['lemur', 'Sannse', 'CC BY-SA 3.0'],
+    ['moose', 'Ryan Hagerty, U.S. Fish and Wildlife Service', 'public domain'], ['panda', 'Aaron Logan', 'CC BY 1.0'], ['polarbear', 'Arturo de Frias Marques', 'CC BY-SA 4.0'],
+    ['macaw', 'Jar0d', 'CC BY-SA 2.0'], ['louvre', 'Jean-Pierre Dalbéra', 'CC BY 2.0'], ['pisa', 'Dan Kamminga', 'CC BY 2.0'], ['parthenon', 'Harrieta', 'CC BY-SA 3.0'],
+    ['empire', 'Lolalatorre', 'CC BY-SA 3.0'], ['capitol', 'Martin Falbisoner', 'CC BY-SA 3.0'], ['domerock', 'Andrew Shiva', 'CC BY-SA 4.0'], ['winter', 'Dezidor', 'CC BY 3.0']];
+
+  const EMOJI = ['🦊','🐸','🐙','🦄','🐢','🦩','🐝','🦕','🍄','🌵','🎃','👻','🤖','👽','🐧','🦔','🥑','🍕','🌈','🦋','🐳','🦀','🍩','🚀'];
+
+  // ───────────── colour: every screen is a finish, [panel, legend]. The button is red on all of them. ─────────────
+  const C = { red: '#e1261c', cream: '#fbf3e1', paper: '#f6efde', ink: '#221c17', putty: '#ddd1b8', mustard: '#e0a526', umber: '#2a1d08', teal: '#1c6a6c',
+              sky: '#a9c5cf', navy: '#14273a', brown: '#5b3a29', avocado: '#9cab5c', olive: '#1f2410', green: '#2c7a4b' };
+  const HOME = [C.putty, C.ink];
+  const FINAL = [C.umber, C.mustard];
+  const WIN = [C.green, C.cream];      // the table lights green
+  const BULL = [C.cream, C.red];       // a target
+  const ROUND_PAIRS = [[C.teal, C.cream], [C.mustard, C.umber], [C.sky, C.navy], [C.brown, C.cream], [C.avocado, C.olive], [C.putty, C.ink]];
+
+  // ───────────── helpers ─────────────
+  const $ = (id) => document.getElementById(id);
+  const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const store = {
+    get(k, fallback) { try { const v = localStorage.getItem(k); return v === null ? fallback : JSON.parse(v); } catch (e) { return fallback; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable: fine */ } }
+  };
+  const vibrate = (p) => { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) { /* fine */ } };
+  const reduceMotion = (() => { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+  const root = document.documentElement;
+  const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+
+  // ───────────── sound (tiny synth, unlocked by the first tap) ─────────────
+  const sound = (() => {
+    let ctx = null;
+    let on = store.get('tapwhen.sound', true) !== false;
+    function ensure() {
+      if (!on) return null;
+      try {
+        if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') ctx.resume();
+        return ctx;
+      } catch (e) { return null; }
+    }
+    function beep(freq, dur, type, gain, when) {
+      const c = ensure(); if (!c) return;
+      try {
+        const t = c.currentTime + (when || 0);
+        const o = c.createOscillator(), g = c.createGain();
+        o.type = type; o.frequency.value = freq;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(gain, t + 0.006);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(g).connect(c.destination);
+        o.start(t); o.stop(t + dur + 0.03);
+      } catch (e) { /* fine */ }
+    }
+    return {
+      get on() { return on; },
+      set(v) { on = !!v; store.set('tapwhen.sound', on); if (on) ensure(); return on; },
+      unlock() { ensure(); },
+      tick()  { beep(1500, 0.035, 'square', 0.025, 0); },
+      click() { beep(900, 0.05, 'triangle', 0.06, 0); },
+      clack() { beep(150, 0.03, 'square', 0.05, 0); beep(95, 0.05, 'square', 0.045, 0.04); },   // the carousel dropping a slide
+      buzz()  { beep(110, 0.28, 'sawtooth', 0.09, 0); },
+      ding()  { beep(660, 0.12, 'triangle', 0.09, 0); beep(990, 0.26, 'triangle', 0.09, 0.1); },
+      bull()  { beep(660, 0.1, 'triangle', 0.09, 0); beep(990, 0.1, 'triangle', 0.09, 0.09); beep(1320, 0.4, 'triangle', 0.1, 0.18); },
+      dead()  { beep(220, 0.18, 'sawtooth', 0.07, 0); beep(165, 0.45, 'sawtooth', 0.07, 0.18); }
+    };
+  })();
+
+  // ───────────── settings ─────────────
+  let pace = PACES[store.get('tapwhen.pace', 'steady')] ? store.get('tapwhen.pace', 'steady') : 'steady';
+  let wrongEnds = store.get('tapwhen.wrong', 'out') === 'end';
+  let mix = store.get('tapwhen.mix', 'all') === 'photos' ? 'photos' : 'all';
+  let autoStart = store.get('tapwhen.autostart', true) !== false;
+
+  // ───────────── state ─────────────
+  const state = {
+    phase: 'start', round: 0, total: ROUNDS, plan: [], spent: [], players: [], pool: [], shown: {}, bad: {},
+    cur: null, idx: -1, slideAt: 0, targetAt: 0, lockUntil: 0, slideTimer: 0, nextAt: 0, leadTimer: 0, leadStep: 0, nopeTimer: 0, armTimer: 0, loadToken: 0,
+    wrongs: [], rt: 0, pts: 1, quick: false, celeTimer: 0, celeSkipAt: 0,
+    quicks: 0, wrongTaps: 0, missed: 0,
+    paused: false, pausedPhase: '', pausedAt: 0, pausedRemain: 0, pendingStart: false, quitTimer: 0
+  };
+
+  // ───────────── screens ─────────────
+  let cur = 'start', wipeTimer = 0, tapX = null, tapY = null;
+  document.addEventListener('pointerdown', (e) => { tapX = e.clientX; tapY = e.clientY; }, true);
+
+  // The edge of a key: its face colour a step darker, or for a dark face a step lighter.
+  function sideOf(hex) {
+    const n = parseInt(hex.slice(1), 16), c = [n >> 16 & 255, n >> 8 & 255, n & 255];
+    const dark = (c[0] * 299 + c[1] * 587 + c[2] * 114) / 1000 < 80;
+    return '#' + c.map(v => Math.round(dark ? v + (255 - v) * 0.27 : v * 0.7).toString(16).padStart(2, '0')).join('');
+  }
+  function setPair(p) {
+    root.style.setProperty('--ground', p[0]); root.style.setProperty('--fg', p[1]); root.style.setProperty('--side', sideOf(p[1]));
+    const tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.setAttribute('content', p[0]);
+  }
+  function origin(el, x, y) {
+    el.style.setProperty('--ox', (x == null ? window.innerWidth / 2 : x) + 'px');
+    el.style.setProperty('--oy', (y == null ? window.innerHeight / 2 : y) + 'px');
+  }
+  // Bring a screen up in its pair. It grows as a disc from the last tap unless `instant` (used under a takeover).
+  function show(name, pair, instant) {
+    const next = $('screen-' + name), prev = $('screen-' + cur);
+    document.querySelectorAll('.screen').forEach(s => { if (s !== next && s !== prev) { s.hidden = true; s.classList.remove('wipe'); s.style.zIndex = ''; } });
+    clearTimeout(wipeTimer);
+    next.style.setProperty('--ground', pair[0]); next.style.setProperty('--fg', pair[1]); next.style.setProperty('--side', sideOf(pair[1]));
+    next.style.setProperty('--inv-ground', pair[1]); next.style.setProperty('--inv-fg', pair[0]); next.style.setProperty('--inv-side', sideOf(pair[0]));
+    next.classList.remove('wipe'); prev.classList.remove('wipe');
+    next.hidden = false; next.scrollTop = 0;
+    if (prev !== next) {
+      if (instant || reduceMotion) { prev.hidden = true; prev.style.zIndex = ''; next.style.zIndex = ''; }
+      else {
+        prev.style.zIndex = '1'; next.style.zIndex = '2';
+        origin(next, tapX, tapY);
+        void next.offsetWidth; next.classList.add('wipe');
+        wipeTimer = setTimeout(() => { prev.hidden = true; prev.style.zIndex = ''; next.style.zIndex = ''; next.classList.remove('wipe'); }, 540);
+      }
+    }
+    cur = name;
+    setPair(pair);
+    const inGame = name === 'round' || name === 'result';
+    $('corner').textContent = inGame ? `Round ${state.round}/${state.total}` : (name === 'end' ? 'Final' : '');
+    $('pauseBtn').hidden = !inGame;
+    $('settingsBtn').hidden = name !== 'start';
+    $('helpBtn').hidden = name !== 'start';
+  }
+  const roundPair = () => ROUND_PAIRS[(Math.max(1, state.round) - 1) % ROUND_PAIRS.length];
+
+  function renderScores() {
+    document.querySelectorAll('.scores').forEach(el => {
+      el.textContent = '';
+      for (const p of state.players) {
+        const c = document.createElement('span'); c.className = 'chip';
+        const e = document.createElement('span'); e.className = 'e'; e.textContent = p.e;
+        const n = document.createElement('span'); n.textContent = p.score;
+        c.append(e, n); el.appendChild(c);
+      }
+      el.hidden = state.players.length === 0;
+    });
+  }
+
+  // ───────────── typefaces: a setting while we try a few (the same four as Perfect Timing) ─────────────
+  const SQ = "'Arial Black','Helvetica Neue',Arial,sans-serif", SANS = "'Helvetica Neue',Arial,sans-serif", NARROW = "'Arial Narrow','Helvetica Neue',Arial,sans-serif";
+  const MONO = "ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace";
+  const GF = 'https://fonts.googleapis.com/css2?family=';
+  const BASE = { 's-head': '100%', 's-key': '100%', 's-shout': '100%', 's-ask': '100%', 's-num': '100%', 's-label': '100%', 's-text': '100%',
+                 't-key': '.04em', 't-label': '.1em', 'z-head': 1, 'z-key': 1, 'z-ask': 1, 'z-label': 1, 'z-text': 1, 'z-legend': 1 };
+  const FACES = {
+    anybody: { name: 'Anybody', note: 'Wide and square-shouldered, like the lettering on a hi-fi. Labels in Martian Mono.',
+      url: GF + 'Anybody:wdth,wght@50..150,100..900&family=Martian+Mono:wdth,wght@75..112.5,100..800&display=swap',
+      probe: ["900 40px 'Anybody'", "600 12px 'Martian Mono'"],
+      v: { 'f-head': "'Anybody'," + SQ, 'w-head': 900, 's-head': '150%',
+           'f-key': "'Anybody'," + SQ, 'w-key': 800, 's-key': '118%', 't-key': '.03em',
+           'f-shout': "'Anybody'," + SQ, 'w-shout': 900, 's-shout': '100%',
+           'f-ask': "'Anybody'," + SANS, 'w-ask': 700, 's-ask': '94%',
+           'f-num': "'Anybody'," + NARROW, 'w-num': 800, 's-num': '68%',
+           'f-label': "'Martian Mono'," + MONO, 'w-label': 600,
+           'f-text': "'Martian Mono'," + MONO, 'w-text': 400, 's-text': '80%' } },
+    barlow: { name: 'Barlow', note: 'Plain and condensed, like a number plate. Labels in IBM Plex Mono.',
+      url: GF + 'Barlow:wght@500;600;700&family=Barlow+Condensed:wght@700;800&family=IBM+Plex+Mono:wght@400;600&display=swap',
+      probe: ["800 40px 'Barlow Condensed'", "700 20px 'Barlow'", "600 12px 'IBM Plex Mono'"],
+      v: { 'f-head': "'Barlow Condensed'," + NARROW, 'w-head': 800, 'z-head': 1.6,
+           'f-key': "'Barlow Condensed'," + NARROW, 'w-key': 700, 't-key': '.08em', 'z-key': 1.25,
+           'f-shout': "'Barlow Condensed'," + NARROW, 'w-shout': 800,
+           'f-ask': "'Barlow'," + SANS, 'w-ask': 700, 'z-ask': 1.06,
+           'f-num': "'Barlow Condensed'," + NARROW, 'w-num': 800,
+           'f-label': "'IBM Plex Mono'," + MONO, 'w-label': 600, 'z-label': 1.04,
+           'f-text': "'Barlow'," + SANS, 'w-text': 500, 'z-text': 1.12, 'z-legend': 1.55 } },
+    plex: { name: 'IBM Plex', note: 'The mainframe manual: a condensed sans, with everything else typed.',
+      url: GF + 'IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Sans+Condensed:wght@700&display=swap',
+      probe: ["700 40px 'IBM Plex Sans Condensed'", "600 20px 'IBM Plex Sans'", "600 12px 'IBM Plex Mono'"],
+      v: { 'f-head': "'IBM Plex Sans Condensed'," + NARROW, 'w-head': 700, 'z-head': 1.5,
+           'f-key': "'IBM Plex Mono'," + MONO, 'w-key': 600, 't-key': '.06em', 'z-key': 0.95,
+           'f-shout': "'IBM Plex Sans Condensed'," + NARROW, 'w-shout': 700,
+           'f-ask': "'IBM Plex Sans'," + SANS, 'w-ask': 600, 'z-ask': 1.02,
+           'f-num': "'IBM Plex Sans Condensed'," + NARROW, 'w-num': 700,
+           'f-label': "'IBM Plex Mono'," + MONO, 'w-label': 600, 'z-label': 1.04,
+           'f-text': "'IBM Plex Mono'," + MONO, 'w-text': 400, 'z-text': 0.97, 'z-legend': 1.1 } },
+    micro: { name: 'Michroma + Saira', note: 'Thin and wide on the nameplates, squared-off numbers. The seventies calculator.',
+      url: GF + 'Michroma&family=Saira:wdth,wght@50..125,100..900&display=swap',
+      probe: ["400 40px 'Michroma'", "800 40px 'Saira'"],
+      v: { 'f-head': "'Michroma'," + SQ, 'w-head': 400, 'z-head': 0.92,
+           'f-key': "'Michroma'," + SQ, 'w-key': 400, 't-key': '.06em', 'z-key': 0.8,
+           'f-shout': "'Saira'," + SQ, 'w-shout': 800,
+           'f-ask': "'Saira'," + SANS, 'w-ask': 700, 'z-ask': 1.04,
+           'f-num': "'Saira'," + NARROW, 'w-num': 800, 's-num': '72%',
+           'f-label': "'Michroma'," + SQ, 'w-label': 400, 't-label': '.12em', 'z-label': 0.86,
+           'f-text': "'Saira'," + SANS, 'w-text': 500, 'z-text': 1.1, 'z-legend': 0.8 } }
+  };
+  const DEFAULT_FACE = 'anybody';
+  let face = DEFAULT_FACE;
+  function loadFace(id) {
+    if (document.querySelector('link[data-face="' + id + '"]')) return;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = FACES[id].url; l.dataset.face = id;
+    document.head.appendChild(l);
+  }
+  function applyFace(id, save) {
+    if (!FACES[id]) id = DEFAULT_FACE;
+    face = id; const f = FACES[id], v = Object.assign({}, BASE, f.v);
+    loadFace(id);
+    for (const k in v) root.style.setProperty('--' + k, v[k]);
+    if (save) store.set('tapwhen.face', id);
+    refit();
+    try { if (document.fonts && document.fonts.load) Promise.all(f.probe.map(p => document.fonts.load(p))).then(refit).catch(() => {}); } catch (e) { /* fine */ }
+  }
+
+  // ───────────── type fitting: everything big is measured in the real face, so any typeface fits ─────────────
+  let probe = null;
+  function emWidth(ref, s) {
+    try {
+      if (!probe) { probe = document.createElement('span'); probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;white-space:nowrap;font-size:200px;line-height:1'; document.body.appendChild(probe); }
+      const cs = getComputedStyle(ref);
+      probe.style.fontFamily = cs.fontFamily; probe.style.fontWeight = cs.fontWeight; probe.style.fontStretch = cs.fontStretch;
+      probe.style.letterSpacing = cs.letterSpacing; probe.style.textTransform = cs.textTransform;
+      probe.textContent = s;
+      const w = probe.getBoundingClientRect().width / 200;
+      return w > 0 ? w : 0.55 * s.length;
+    } catch (e) { return 0.55 * s.length; }
+  }
+  const M = { dw: 0.5, cw: 0.22 };
+  function measure() {
+    const ref = $('celeNum'); let w = 0;
+    for (const d of '0123456789') w = Math.max(w, emWidth(ref, d));
+    M.dw = w || 0.5; M.cw = emWidth(ref, '.') || 0.22;
+    root.style.setProperty('--dw', M.dw.toFixed(3) + 'em'); root.style.setProperty('--cw', M.cw.toFixed(3) + 'em');
+  }
+  function fitReadout(el, s, maxPx, avail) {
+    let h = '', nd = 0, nc = 0;
+    for (const ch of s) { if (ch >= '0' && ch <= '9') { h += '<b class="d">' + ch + '</b>'; nd++; } else { h += '<b class="c">' + ch + '</b>'; nc++; } }
+    el.innerHTML = h;
+    const em = nd * (M.dw + 0.2) + nc * (M.cw - 0.06) + (nd + nc - 1) * 0.055;
+    el.style.fontSize = Math.floor(Math.min(maxPx, avail / em)) + 'px';
+  }
+  function fitWord(el, text, maxPx, avail) {
+    let em = 0.5;
+    for (const w of text.split(/\s+/)) em = Math.max(em, emWidth(el, w));
+    el.style.fontSize = Math.floor(Math.min(maxPx, avail / em)) + 'px';
+  }
+  const vmin = () => Math.min(innerWidth, innerHeight);
+  function fitMark() {
+    fitWord(document.querySelector('.mark'), 'Tap When', Math.max(40, Math.min(innerWidth * 0.24, innerHeight * 0.13, 132)), Math.min(innerWidth - 44, 560));
+  }
+  // A title slide: the type as large as the window allows, measured where it sits.
+  function fitCard(node) {
+    const span = node.firstChild, W = node.clientWidth, H = node.clientHeight;
+    if (!span || !W) return;
+    const text = span.textContent;
+    let em = 0.5; for (const w of text.split(/\s+/)) em = Math.max(em, emWidth(span, w));
+    let size = Math.min(node.classList.contains('num') ? H * 0.66 : H * 0.36, W * 0.84 / em);
+    span.style.fontSize = size + 'px';
+    for (let i = 0; i < 14 && span.offsetHeight > H * 0.84; i++) { size *= 0.9; span.style.fontSize = size + 'px'; }
+  }
+  function refit() {
+    measure(); fitMark();
+    const c = document.querySelector('#slide .card'); if (c) fitCard(c);
+    const w = $('win'); if (w && w.clientHeight) $('leadNum').style.fontSize = Math.round(w.clientHeight * 0.6) + 'px';
+  }
+
+  // ───────────── picking a game: ten reels, a few from each shelf, no two alike ─────────────
+  const reelById = (id) => REELS.find(r => r.id === id);
+  const usable = (r) => r.yes.some(s => !state.bad[s.k]);
+  function pickPlan() {
+    const want = MIX[mix], out = [], groups = {};
+    for (const pool of Object.keys(want)) {
+      let n = want[pool];
+      for (const r of shuffle(REELS.filter(r => r.pool === pool && usable(r)))) {
+        if (!n) break;
+        if (r.x && groups[r.x]) continue;
+        if (r.x) groups[r.x] = true;
+        out.push(r.id); n--;
+      }
+    }
+    for (const r of shuffle(REELS)) {                    // top up if a shelf ran short
+      if (out.length >= ROUNDS) break;
+      if (out.includes(r.id) || !usable(r) || (r.x && groups[r.x]) || (mix === 'photos' && r.words)) continue;
+      if (r.x) groups[r.x] = true;
+      out.push(r.id);
+    }
+    // deal them so the same shelf doesn't come up twice running, where that can be helped
+    let best = shuffle(out), bestBad = Infinity;
+    for (let t = 0; t < 40 && bestBad > 0; t++) {
+      const a = shuffle(out); let bad = 0;
+      for (let i = 1; i < a.length; i++) if (reelById(a[i]).pool === reelById(a[i - 1]).pool) bad++;
+      if (bad < bestBad) { best = a; bestBad = bad; }
+    }
+    return best.slice(0, ROUNDS);
+  }
+  // One round: which slide is the right one, how many wrong ones come first, and which.
+  // The wait is drawn evenly from zero to MAX_WAIT seconds, so the right slide is sometimes the first one up.
+  function buildRound(reel) {
+    const interval = PACES[pace];
+    const fresh = (list) => shuffle(list.filter(s => !state.bad[s.k])).sort((a, b) => (state.shown[a.k] || 0) - (state.shown[b.k] || 0));   // least seen this game first
+    const target = fresh(reel.yes)[0];
+    const pool = fresh(reel.no);
+    const maxK = Math.max(0, Math.min(pool.length - 1, Math.floor(MAX_WAIT / interval)));
+    const k = Math.floor(Math.random() * (maxK + 1));
+    const decoys = pool.slice(0, k + 1);                 // k before the right slide, and one to follow it
+    if (k >= 3 && !decoys.slice(0, k).some(d => d.n && d.n !== reel.nn)) {   // a long reel should have a tempting one in it
+      const t = shuffle(pool.slice(k + 1).filter(d => d.n && d.n !== reel.nn))[0];
+      if (t) decoys[Math.floor(Math.random() * k)] = t;
+    }
+    return { reel, interval, k, target, seq: decoys.slice(0, k).concat([target], decoys.slice(k)) };
+  }
+
+  // ───────────── loading slides: a round's photos are fetched and decoded before its reel runs ─────────────
+  const cache = new Map();
+  function loadOne(id) {
+    if (cache.has(id)) return cache.get(id).p;
+    const img = new Image(); img.decoding = 'async'; img.alt = ''; img.draggable = false;
+    const entry = { img, ok: false, p: null };
+    entry.p = new Promise((res) => {
+      img.onload = () => { const done = () => { entry.ok = true; res(true); }; if (img.decode) img.decode().then(done, done); else done(); };
+      img.onerror = () => { state.bad[id] = true; res(false); };
+    });
+    img.src = 'img/' + id + '.webp';
+    cache.set(id, entry);
+    return entry.p;
+  }
+  function preload(round) {
+    const ids = round.seq.filter(s => s.img).map(s => s.k);
+    return Promise.race([Promise.all(ids.map(loadOne)), new Promise(r => setTimeout(r, 9000))])
+      .then(() => ids.every(id => cache.get(id).ok));
+  }
+  function warmNext() {                                   // while people argue over the last round, fetch a likely next one
+    const next = reelById(state.plan[state.round]);
+    if (next && !next.words) { try { buildRound(next).seq.forEach(s => loadOne(s.k)); } catch (e) { /* fine */ } }
+  }
+
+  // ───────────── game flow ─────────────
+  function newGame() {
+    state.shown = {}; state.spent = [];
+    state.plan = pickPlan();
+    state.total = state.plan.length;
+    state.round = 0; state.players = []; state.pool = shuffle(EMOJI); state.quicks = 0; state.wrongTaps = 0; state.missed = 0;
+    sound.unlock();
+    renderScores();
+    startRound();
+  }
+
+  function startRound() {
+    state.round++;
+    setRound(reelById(state.plan[state.round - 1]), 0);
+    show('round', roundPair());
+  }
+  // Put a reel on the machine: the ask goes up, the photos load, then the leader runs (or waits for Start).
+  function setRound(reel, tries) {
+    stopReel();
+    state.cur = buildRound(reel);
+    state.wrongs = []; state.idx = -1; state.targetAt = 0;
+    $('qText').textContent = reel.q;
+    $('slide').replaceChildren();
+    $('slideNo').textContent = 'Reel ' + String(state.round).padStart(2, '0');
+    $('legend').textContent = '';
+    $('giveUp').hidden = true; disarmGiveUp();
+    $('skipBtn').hidden = !spare().length;
+    const lead = $('leader'); lead.hidden = false; lead.className = 'leader wait'; $('leadNum').textContent = 'Loading';
+    state.phase = 'loading';
+    const token = ++state.loadToken;
+    preload(state.cur).then((ok) => {
+      if (token !== state.loadToken || state.phase !== 'loading') return;
+      if (!ok && tries < 3) {                             // a photo would not load: rebuild without it, or move to another reel
+        const again = usable(reel) && tries < 1 ? reel : (spare()[0] || reel);
+        if (again !== reel) { state.spent.push(reel.id); state.plan[state.round - 1] = again.id; }
+        setRound(again, tries + 1); return;
+      }
+      if (state.paused) { state.pendingStart = true; return; }
+      armRound();
+    });
+  }
+  function armRound() {
+    if (autoStart) startLeader();
+    else { state.phase = 'ready'; $('leadNum').textContent = 'Ready'; $('legend').textContent = 'Start'; }
+  }
+  function startLeader() {
+    state.phase = 'leader'; state.leadStep = 3;
+    $('legend').textContent = '';
+    refit();
+    leadBeat();
+  }
+  function leadBeat() {
+    const lead = $('leader');
+    if (state.leadStep === 0) { lead.hidden = true; startSlides(); return; }
+    lead.className = 'leader'; void lead.offsetWidth; lead.className = 'leader run';
+    lead.style.setProperty('--step', LEAD_STEP_MS + 'ms');
+    $('leadNum').textContent = state.leadStep;
+    sound.tick();
+    state.leadStep--;
+    state.leadTimer = setTimeout(leadBeat, LEAD_STEP_MS);
+  }
+  function startSlides() {
+    state.phase = 'slides'; state.idx = -1;
+    state.lockUntil = performance.now() + START_LOCK_MS;
+    $('giveUp').hidden = false;
+    advance();
+  }
+  function schedule(ms, fn) { clearTimeout(state.slideTimer); state.nextAt = performance.now() + ms; state.slideFn = fn; state.slideTimer = setTimeout(fn, ms); }
+  function advance() {
+    state.idx++;
+    const r = state.cur, i = state.idx, s = r.seq[i];
+    let node;
+    if (!s) { node = makeCard('End of reel', 'end'); }
+    else if (s.img) node = cache.get(s.k).img;
+    else node = makeCard(s.t, r.reel.num ? 'num' : '');
+    $('slide').replaceChildren(node);
+    if (node.classList.contains('card')) fitCard(node);
+    if (!reduceMotion) { node.classList.remove('clack'); void node.offsetWidth; node.classList.add('clack'); }
+    $('slideNo').textContent = 'No. ' + String(i + 1).padStart(2, '0');
+    sound.clack();
+    if (s) state.shown[s.k] = (state.shown[s.k] || 0) + 1;
+    state.slideAt = performance.now();
+    if (i === r.k) state.targetAt = state.slideAt;
+    if (i > r.k) { state.phase = 'after'; schedule(Math.min(AFTER_MS, r.interval * 1000), missed); }   // it has gone by
+    else schedule(r.interval * 1000, advance);
+  }
+  function makeCard(text, kind) {
+    const d = document.createElement('div'); d.className = 'card' + (kind ? ' ' + kind : '');
+    const s = document.createElement('span'); s.textContent = text; d.appendChild(s);
+    return d;
+  }
+  function stopReel() {
+    clearTimeout(state.slideTimer); clearTimeout(state.leadTimer); clearTimeout(state.nopeTimer);
+    $('early').classList.remove('show'); $('well').classList.remove('early'); $('bigBtn').classList.remove('down');
+    $('nope').classList.remove('show'); $('win').classList.remove('wrong');
+  }
+
+  // The button. A tap in the first instant after a slide change was aimed at the slide before it.
+  function onBigTap() {
+    const now = performance.now();
+    if (state.paused) return;
+    if (state.phase === 'ready') { sound.unlock(); startLeader(); return; }
+    if ((state.phase !== 'slides' && state.phase !== 'after') || now < state.lockUntil) return;
+    const r = state.cur;
+    let i = state.idx;
+    if (i > 0 && now - state.slideAt < GRACE_MS) i--;
+    if (i === r.k) hit(now);
+    else if (state.phase === 'after') { clearTimeout(state.slideTimer); missed(); }        // too late: it had already gone
+    else wrong(r.seq[i], now);
+  }
+  function wrong(s, now) {
+    state.wrongTaps++;
+    if (s && !state.wrongs.includes(s)) state.wrongs.push(s);
+    sound.buzz(); vibrate(60);
+    const tape = $('nope'); tape.textContent = s ? s.t : 'Nope';
+    if (wrongEnds) { stopReel(); lateTakeover('Wrong slide', 'wrong'); return; }
+    // freeze the reel with the slide's name on it, then carry on from where it stopped
+    const b = $('well'), cap = $('early');
+    b.classList.remove('early'); void b.offsetWidth; b.classList.add('early');
+    cap.classList.add('show'); tape.classList.add('show'); $('win').classList.add('wrong');
+    state.lockUntil = now + NOPE_HOLD_MS;
+    const remain = Math.max(0, state.nextAt - now);
+    schedule(remain + NOPE_HOLD_MS, state.slideFn);
+    clearTimeout(state.nopeTimer);
+    state.nopeTimer = setTimeout(() => { cap.classList.remove('show'); b.classList.remove('early'); tape.classList.remove('show'); $('win').classList.remove('wrong'); }, NOPE_HOLD_MS);
+  }
+  function hit(now) {
+    stopReel();
+    state.rt = Math.max(0, (now - state.targetAt) / 1000);
+    state.quick = state.rt <= QUICK_SECS;
+    state.pts = state.quick ? 2 : 1;
+    if (state.quick) { state.quicks++; sound.bull(); vibrate([30, 40, 30, 40, 80]); }
+    else { sound.ding(); vibrate([30, 40, 30]); }
+    celebrate();
+  }
+  function missed() { stopReel(); state.missed++; lateTakeover('Missed it', 'missed'); }
+  function lateTakeover(word, why) {
+    sound.dead(); vibrate(120);
+    state.phase = 'late';
+    const el = $('late'); el.classList.remove('out'); discOrigin(el); el.hidden = false;
+    $('lateWord').textContent = word;
+    fitWord($('lateWord'), word, Math.max(64, Math.min(vmin() * 0.28, 220)), Math.min(innerWidth - 40, 600));
+    clearTimeout(state.celeTimer);
+    state.celeTimer = setTimeout(() => { showResult(false, why, true); fadeOut(el); }, reduceMotion ? 800 : LATE_SHOW_MS);
+  }
+
+  // "Skip it": swap this round's reel for a fresh one from the same shelf and start the round over. Nothing counts.
+  function spare() {
+    const used = new Set(state.plan.concat(state.spent));
+    const all = REELS.filter(r => !used.has(r.id) && usable(r) && !(mix === 'photos' && r.words));
+    const here = state.cur ? all.filter(r => r.pool === state.cur.reel.pool) : [];
+    return shuffle(here.length ? here : all);
+  }
+  function skipIt() {
+    if (!['loading', 'ready', 'leader', 'slides'].includes(state.phase) || state.paused) return;
+    const next = spare()[0]; if (!next) return;
+    state.spent.push(state.plan[state.round - 1]);
+    state.plan[state.round - 1] = next.id;
+    sound.unlock(); setRound(next, 0);
+  }
+
+  // ───────────── takeovers ─────────────
+  const WIN_LINES = ['You got it!', 'Nailed it.', 'That\'s the one.', 'Yes!', 'Right on.', 'Got it!', 'Ding ding.'];
+  const dots = (() => {
+    let parts = [], raf = 0, cv = null, ctx = null, running = false;
+    function size() {
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      cv.width = Math.floor(innerWidth * dpr); cv.height = Math.floor(innerHeight * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function burst(n, x, y, colors, power, dirX) {
+      for (let i = 0; i < n; i++) {
+        const ang = Math.random() * Math.PI * 2, sp = (0.35 + Math.random() * 0.65) * power;
+        let vx = Math.cos(ang) * sp, vy = Math.sin(ang) * sp - power * 0.35;
+        if (dirX) { vx = Math.abs(vx) * dirX; vy = -Math.abs(vy) - power * 0.3; }
+        parts.push({ x, y, vx, vy, r: 3.5 + Math.random() * 7.5, c: colors[Math.floor(Math.random() * colors.length)] });
+      }
+    }
+    function tick() {
+      if (!running) return;
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      let alive = 0;
+      for (const p of parts) {
+        p.vy += 0.3; p.vx *= 0.99; p.vy *= 0.995; p.x += p.vx; p.y += p.vy;
+        if (p.y > innerHeight + 40) continue;
+        alive++;
+        ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832); ctx.fill();
+      }
+      if (alive) raf = requestAnimationFrame(tick); else running = false;
+    }
+    return {
+      start(level, x, y) {
+        if (reduceMotion) return;
+        try {
+          cv = $('confetti'); ctx = cv.getContext('2d'); if (!ctx) return;
+          size(); parts = []; running = true; cancelAnimationFrame(raf);
+          const W = innerWidth, H = innerHeight;
+          if (level === 2) {
+            const cols = [C.red, C.red, C.ink, C.mustard, C.teal];
+            burst(240, x, y, cols, 15, 0);
+            burst(100, 0, H, cols, 20, 1); burst(100, W, H, cols, 20, -1);
+            setTimeout(() => { if (running) burst(160, W / 2, H * 0.42, cols, 13, 0); }, 380);
+          } else {
+            burst(140, x, y, [C.cream, C.cream, C.mustard, C.sky], 13, 0);
+          }
+          raf = requestAnimationFrame(tick);
+        } catch (e) { running = false; }
+      },
+      stop() { running = false; cancelAnimationFrame(raf); if (ctx) { try { ctx.clearRect(0, 0, innerWidth, innerHeight); } catch (e) { /* fine */ } } }
+    };
+  })();
+
+  function discOrigin(el) {
+    const r = $('bigBtn').getBoundingClientRect();
+    const x = r.width ? r.left + r.width / 2 : null, y = r.width ? r.top + r.height / 2 : null;
+    origin(el, x, y);
+    return [x == null ? innerWidth / 2 : x, y == null ? innerHeight / 2 : y];
+  }
+  function fadeOut(el) {
+    if (reduceMotion) { el.hidden = true; return; }
+    el.classList.add('out');
+    setTimeout(() => { el.hidden = true; el.classList.remove('out'); }, 430);
+  }
+
+  function celebrate() {
+    const q = state.quick, el = $('cele');
+    const pair = q ? BULL : WIN;                                     // a win lights the table green; a quick draw is a red-and-cream target
+    el.style.setProperty('--ground', pair[0]); el.style.setProperty('--fg', pair[1]);
+    el.classList.remove('out'); el.classList.toggle('bull', q);
+    $('celeEyebrow').textContent = `Round ${state.round} of ${state.total}`;
+    const headline = q ? 'Quick draw!' : WIN_LINES[Math.floor(Math.random() * WIN_LINES.length)];
+    $('celeTitle').textContent = headline;
+    $('celeUnit').textContent = 'seconds';
+    $('celeChip').hidden = !q;
+    $('celeSub').textContent = state.cur.target.t;
+    const [x, y] = discOrigin(el);
+    state.phase = 'cele';
+    el.hidden = false;
+    fitWord($('celeTitle'), headline, q ? Math.max(64, Math.min(vmin() * 0.25, 210)) : Math.max(60, Math.min(vmin() * 0.22, 190)), Math.min(innerWidth - 40, 600));
+    fitReadout($('celeNum'), state.rt.toFixed(2), Math.min(110, innerWidth * 0.22), Math.min(innerWidth - 48, 560));
+    dots.start(q ? 2 : 1, x, y);
+    state.celeSkipAt = performance.now() + 650;                     // a tap after this skips ahead (slams right after the win don't)
+    clearTimeout(state.celeTimer);
+    state.celeTimer = setTimeout(endCelebration, reduceMotion ? 1200 : q ? 3000 : 1900);
+  }
+  function endCelebration() {
+    clearTimeout(state.celeTimer);
+    if (state.phase !== 'cele') return;
+    dots.stop();
+    showResult(true, '', true);
+    fadeOut($('cele'));
+  }
+
+  // ───────────── the review ─────────────
+  function showResult(won, why, instant) {
+    const r = state.cur, t = r.target;
+    state.phase = 'result';
+    if (!won) { state.pts = 0; state.quick = false; }
+    $('resEyebrow').textContent = won ? (state.quick ? 'Quick draw · double points' : 'Correct') : why === 'missed' ? 'Missed it' : why === 'wrong' ? 'Wrong slide' : 'Everyone out';
+    $('resEyebrow').classList.toggle('red', won && state.quick);
+    const shot = $('resShot'); shot.hidden = !t.img; if (t.img) shot.src = 'img/' + t.k + '.webp';
+    $('resFound').classList.toggle('words', !t.img);
+    $('resName').textContent = t.t;
+    const secs = r.interval + (r.interval === 1 ? ' second' : ' seconds');
+    const away = r.k - state.idx;
+    $('resTapped').textContent = won ? `Spotted in ${state.rt.toFixed(2)} seconds.`
+      : why === 'missed' ? `Up for ${secs}, and nobody tapped. Nobody scores.`
+      : away > 0 ? `This was the one to wait for, ${plural(away, 'slide')} further on. Nobody scores.` : 'This was the one to wait for. Nobody scores.';
+    $('resNote').textContent = t.n || ''; $('resNote').hidden = !t.n;
+    const fl = $('resFalseList'); fl.textContent = '';
+    for (const s of state.wrongs) {
+      const li = document.createElement('li'), b = document.createElement('b'); b.textContent = s.t;
+      li.append(b, document.createTextNode(s.n ? '  ' + s.n : ''));
+      fl.appendChild(li);
+    }
+    $('resFalse').hidden = !state.wrongs.length;
+    $('resFalseLabel').textContent = state.wrongs.length === 1 ? 'Wrong tap' : 'Wrong taps';
+    const who = $('who'); who.textContent = ''; who.hidden = false;
+    $('plate').hidden = true; $('nextBtn').hidden = true;
+    if (won && state.players.length === 0) {
+      handAvatar('First point', 'Whoever got that, this is you.');      // nobody has a face yet, so the winner gets one here
+    } else {
+      // every face with its score; after a win they are the buttons that take the points
+      $('whoLabel').textContent = won ? (state.pts === 2 ? 'Who got it? Two points.' : 'Who got it?') : (state.players.length ? 'Scores' : 'No points yet');
+      state.players.forEach((p, i) => {
+        const b = document.createElement('button'); b.className = 'pbtn'; b.type = 'button'; b.disabled = !won;
+        const e = document.createElement('span'); e.className = 'e'; e.textContent = p.e;
+        const n = document.createElement('b'); n.textContent = p.score;
+        b.append(e, n); b.setAttribute('aria-label', 'Player ' + p.e + ', ' + p.score);
+        b.addEventListener('click', () => award(i));
+        who.appendChild(b);
+      });
+      who.hidden = !who.children.length && !won;
+      if (won) {
+        const nb = document.createElement('button'); nb.className = 'pill ghost'; nb.type = 'button'; nb.textContent = 'Someone new';
+        nb.addEventListener('click', () => handAvatar('New player', "You're this now."));
+        who.appendChild(nb);
+      } else $('nextBtn').hidden = false;
+    }
+    const last = state.round >= state.total;
+    $('nextBtn').textContent = last ? 'Final scores' : 'Next round';
+    show('result', roundPair(), instant);
+    if (!last) warmNext();
+  }
+
+  function takeEmoji() {
+    if (!state.pool.length) state.pool = shuffle(EMOJI);
+    return state.pool.shift();
+  }
+  function award(i) { state.players[i].score += state.pts; renderScores(); advanceGame(); }
+  // A new face goes to whoever just won, in the scoreboard half of the review.
+  function handAvatar(label, title) {
+    const e = takeEmoji();
+    state.players.push({ e, score: state.pts });
+    renderScores();
+    $('whoLabel').textContent = label; $('plateEmoji').textContent = e; $('plateTitle').textContent = title;
+    $('who').hidden = true; $('plate').hidden = false; $('nextBtn').hidden = false;
+  }
+  function advanceGame() { sound.unlock(); if (state.round >= state.total) endGame(); else startRound(); }
+
+  function armGiveUp() {
+    const g = $('giveUp');
+    if (g.classList.contains('armed')) { disarmGiveUp(); stopReel(); showResult(false, 'out'); return; }
+    g.classList.add('armed'); g.textContent = 'Sure? Tap again';
+    clearTimeout(state.armTimer);
+    state.armTimer = setTimeout(disarmGiveUp, 2500);
+  }
+  function disarmGiveUp() {
+    clearTimeout(state.armTimer);
+    const g = $('giveUp'); g.classList.remove('armed'); g.textContent = 'Everyone\'s out';
+  }
+
+  function endGame() {
+    state.phase = 'end';
+    const ps = state.players.slice().sort((x, y) => y.score - x.score);
+    const top = ps.length ? ps[0].score : 0;
+    const winners = ps.filter(p => p.score === top);
+    $('endEyebrow').textContent = !ps.length ? 'Game over' : winners.length === 1 ? 'Winner' : 'Tie game';
+    $('endHero').textContent = ps.length ? winners.map(p => p.e).join(' ') : '🫥';
+    $('endLine').textContent = !ps.length ? 'Nobody scored. Tough reels.' : winners.length === 1 ? `Wins with ${plural(top, 'point')}.` : `Tied at ${top}.`;
+    const rank = $('rank'); rank.textContent = '';
+    for (const p of ps) {
+      const row = document.createElement('div'); row.className = 'rowb';
+      const e = document.createElement('span'); e.className = 'e'; e.textContent = p.e;
+      const pts = document.createElement('span'); pts.className = 'total'; pts.textContent = p.score;
+      row.append(e, document.createElement('span'), pts); rank.appendChild(row);
+    }
+    rank.hidden = ps.length < 2;
+    const parts = [plural(state.quicks, 'quick draw'), plural(state.wrongTaps, 'wrong tap')];
+    if (state.missed) parts.push(plural(state.missed, 'missed slide'));
+    const stats = $('endStats'); stats.textContent = '';
+    for (const p of parts) { const d = document.createElement('div'); d.textContent = p; stats.appendChild(d); }
+    show('end', FINAL);
+  }
+  function goHome() { state.phase = 'start'; state.round = 0; show('start', HOME); }
+
+  // ───────────── sheets ─────────────
+  function openSheet(id) { const el = $(id); origin(el, tapX, tapY); el.hidden = false; el.scrollTop = 0; }
+  function closeSheet(id) { $(id).hidden = true; }
+  const anySheet = () => ['credits', 'rules', 'settings'].find(id => !$(id).hidden);
+
+  function paintSettings() {
+    const on = (id, v) => { const el = $(id); el.classList.toggle('on', !!v); el.setAttribute('aria-pressed', v ? 'true' : 'false'); };
+    on('paceBrisk', pace === 'brisk'); on('paceSteady', pace === 'steady'); on('paceSlow', pace === 'slow');
+    on('wrongOut', !wrongEnds); on('wrongEnd', wrongEnds);
+    on('mixAll', mix === 'all'); on('mixPhotos', mix === 'photos');
+    on('startAuto', autoStart); on('startTap', !autoStart);
+    on('sndOn', sound.on); on('sndOff', !sound.on);
+    const every = PACES[pace] === 2 ? 'two seconds' : PACES[pace] === 3 ? 'three seconds' : PACES[pace] + ' seconds';
+    $('rule2b').textContent = autoStart ? 'Watch the slides.' : 'Start the reel.';
+    $('rule2').textContent = (autoStart ? 'After a three, two, one, a' : 'One tap on Start, a three, two, one, and a') + ` new slide comes up every ${every}. Nearly all of them are not it.`;
+    $('rule5').textContent = wrongEnds ? 'The button buzzes, the round is over and nobody scores.' : 'The button buzzes and the tape says what you hit. You sit out the rest of the round.';
+    document.querySelectorAll('#faceOpts .opt').forEach(b => { const v = b.dataset.face === face; b.classList.toggle('on', v); b.setAttribute('aria-pressed', v ? 'true' : 'false'); });
+    const photos = new Set(); let words = 0;
+    for (const r of REELS) { if (r.words) words++; else r.yes.concat(r.no).forEach(s => photos.add(s.k)); }
+    $('settingsDeckInfo').textContent = `${REELS.length} reels: ${REELS.length - words} of photos (${photos.size} slides between them) and ${words} of names and numbers. Each game draws ten.`;
+  }
+  function setOpt(key, value, apply) { apply(); store.set(key, value); paintSettings(); }
+
+  // ───────────── pause / quit ─────────────
+  function pauseGame() {
+    const p = state.phase;
+    if (state.paused || !['loading', 'ready', 'leader', 'slides', 'after', 'result'].includes(p)) return;
+    state.paused = true; state.pausedPhase = p; state.pausedAt = performance.now();
+    if (p === 'slides' || p === 'after') { state.pausedRemain = Math.max(0, state.nextAt - state.pausedAt); clearTimeout(state.slideTimer); }   // freeze the reel where it is
+    if (p === 'leader') clearTimeout(state.leadTimer);
+    disarmQuit();
+    $('pauseTitle').textContent = `Round ${state.round} of ${state.total}`;
+    openSheet('pause');
+  }
+  function resumeGame() {
+    if (!state.paused) return;
+    const now = performance.now(), gap = now - state.pausedAt, p = state.pausedPhase;
+    state.paused = false;
+    closeSheet('pause');
+    if (p === 'slides' || p === 'after') {                                     // the slide picks up exactly where it stopped
+      state.slideAt += gap; if (state.targetAt) state.targetAt += gap;
+      state.lockUntil = Math.max(state.lockUntil + gap, now + 300);
+      schedule(state.pausedRemain, state.slideFn);
+    } else if (p === 'leader') startLeader();
+    else if (p === 'loading' && state.pendingStart) { state.pendingStart = false; armRound(); }
+  }
+  function quitGame() {
+    const q = $('quitBtn');
+    if (!q.classList.contains('armed')) {
+      q.classList.add('armed'); q.textContent = 'Sure? Tap again to quit';
+      clearTimeout(state.quitTimer); state.quitTimer = setTimeout(disarmQuit, 2500);
+      return;
+    }
+    disarmQuit();
+    stopReel(); state.loadToken++; dots.stop(); clearTimeout(state.celeTimer); $('cele').hidden = true; $('late').hidden = true;
+    state.paused = false; state.pendingStart = false; closeSheet('pause');
+    state.players = []; renderScores();
+    goHome();
+  }
+  function disarmQuit() { clearTimeout(state.quitTimer); const q = $('quitBtn'); q.classList.remove('armed'); q.textContent = 'Quit game'; }
+
+  // ───────────── wiring ─────────────
+  function wire() {
+    const big = $('bigBtn');
+    let pointerHandled = false;
+    big.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 && e.pointerType === 'mouse') return;
+      pointerHandled = true; big.classList.add('down');
+      onBigTap();
+    });
+    const up = () => big.classList.remove('down');
+    big.addEventListener('pointerup', up); big.addEventListener('pointercancel', up); big.addEventListener('pointerleave', up);
+    big.addEventListener('click', (e) => { if (pointerHandled) { pointerHandled = false; e.preventDefault(); return; } onBigTap(); });
+    big.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); onBigTap(); } });
+    big.addEventListener('contextmenu', (e) => e.preventDefault());
+    big.addEventListener('touchstart', () => {}, { passive: true });
+    document.addEventListener('touchstart', () => {}, { passive: true });   // lets :active show on iOS, so every key goes down when you press it
+
+    $('playBtn').addEventListener('click', newGame);
+    $('againBtn').addEventListener('click', newGame);
+    $('homeBtn').addEventListener('click', goHome);
+    $('helpBtn').addEventListener('click', () => { paintSettings(); openSheet('rules'); });
+    for (const id of Object.keys(FACES)) {                               // one row per typeface, each set in its own face
+      const f = FACES[id], b = document.createElement('button'); b.className = 'opt'; b.type = 'button'; b.dataset.face = id;
+      const tt = document.createElement('span'); tt.className = 't'; tt.textContent = f.name;
+      tt.style.fontFamily = f.v['f-ask']; tt.style.fontWeight = f.v['w-ask']; tt.style.fontStretch = f.v['s-ask'] || '100%';
+      const dd = document.createElement('span'); dd.className = 'd'; dd.textContent = f.note;
+      b.append(tt, dd); b.addEventListener('click', () => { applyFace(id, true); paintSettings(); });
+      $('faceOpts').appendChild(b);
+    }
+    for (const [k, who, lic] of CREDITS) {
+      const li = document.createElement('li'), b = document.createElement('b'); b.textContent = NAMES[k];
+      li.append(b, document.createTextNode(': ' + who + ', ' + lic + ', via Wikimedia Commons')); $('credList').appendChild(li);
+    }
+    $('settingsBtn').addEventListener('click', () => { Object.keys(FACES).forEach(loadFace); paintSettings(); openSheet('settings'); });
+    $('creditsBtn').addEventListener('click', () => openSheet('credits'));
+    document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => closeSheet(b.dataset.close)));
+    $('paceBrisk').addEventListener('click', () => setOpt('tapwhen.pace', 'brisk', () => { pace = 'brisk'; }));
+    $('paceSteady').addEventListener('click', () => setOpt('tapwhen.pace', 'steady', () => { pace = 'steady'; }));
+    $('paceSlow').addEventListener('click', () => setOpt('tapwhen.pace', 'slow', () => { pace = 'slow'; }));
+    $('wrongOut').addEventListener('click', () => setOpt('tapwhen.wrong', 'out', () => { wrongEnds = false; }));
+    $('wrongEnd').addEventListener('click', () => setOpt('tapwhen.wrong', 'end', () => { wrongEnds = true; }));
+    $('mixAll').addEventListener('click', () => setOpt('tapwhen.mix', 'all', () => { mix = 'all'; }));
+    $('mixPhotos').addEventListener('click', () => setOpt('tapwhen.mix', 'photos', () => { mix = 'photos'; }));
+    $('startAuto').addEventListener('click', () => setOpt('tapwhen.autostart', true, () => { autoStart = true; }));
+    $('startTap').addEventListener('click', () => setOpt('tapwhen.autostart', false, () => { autoStart = false; }));
+    $('sndOn').addEventListener('click', () => { sound.set(true); sound.click(); paintSettings(); });
+    $('sndOff').addEventListener('click', () => { sound.set(false); paintSettings(); });
+    $('nextBtn').addEventListener('click', advanceGame);
+    $('giveUp').addEventListener('click', armGiveUp);
+    $('skipBtn').addEventListener('click', skipIt);
+    $('cele').addEventListener('pointerdown', () => { if (state.phase === 'cele' && performance.now() >= state.celeSkipAt) endCelebration(); });
+    $('pauseBtn').addEventListener('click', pauseGame);
+    $('resumeBtn').addEventListener('click', resumeGame);
+    $('quitBtn').addEventListener('click', quitGame);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { const s = anySheet(); if (s) closeSheet(s); else if (state.paused) resumeGame(); else pauseGame(); return; }
+      if (state.paused || anySheet()) return;
+      if (e.key !== ' ' && e.key !== 'Enter') return;
+      if (state.phase === 'cele') { e.preventDefault(); if (performance.now() >= state.celeSkipAt) endCelebration(); return; }
+      if ((state.phase === 'slides' || state.phase === 'after') && document.activeElement !== big) { e.preventDefault(); onBigTap(); }
+    });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) pauseGame(); });   // a reel shouldn't run with nobody watching
+    window.addEventListener('resize', refit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit).catch(() => {});
+  }
+
+  // ───────────── boot (survives live republishes) ─────────────
+  function snapshot() {
+    return { v: 1, phase: state.phase, round: state.round, total: state.total, plan: state.plan, spent: state.spent, players: state.players,
+             pool: state.pool, shown: state.shown, quicks: state.quicks, wrongTaps: state.wrongTaps, missed: state.missed };
+  }
+  function boot(data) {
+    wire(); applyFace(store.get('tapwhen.face', store.get('notyet.face', DEFAULT_FACE)), false); paintSettings();
+    const d = data || {};
+    if (d.v === 1 && Array.isArray(d.plan) && d.plan.length && d.plan.every(reelById) && d.round > 0) {
+      Object.assign(state, { total: d.total || d.plan.length, plan: d.plan, spent: d.spent || [], players: d.players || [], pool: d.pool && d.pool.length ? d.pool : shuffle(EMOJI),
+                             shown: d.shown || {}, quicks: d.quicks || 0, wrongTaps: d.wrongTaps || 0, missed: d.missed || 0 });
+      renderScores();
+      if (d.phase === 'end') { state.round = d.round; endGame(); }
+      else { state.round = d.round - 1; startRound(); }
+    } else {
+      show('start', HOME, true);
+    }
+  }
+  if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(snapshot);
+  if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(boot);
+  else boot(window.claude && window.claude.hot ? window.claude.hot.data : null);
+
+})();
+</script>
+</body>
+</html>
