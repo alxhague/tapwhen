@@ -9,7 +9,7 @@ A party-game prototype. Each round names one thing to wait for: a carnivore, a l
 - If the right slide goes by untapped, nobody scores.
 - Ten rounds. Most points wins.
 
-There are 54 reels on six shelves: animals, landmarks, art, space, flags, and names and numbers. Each game draws ten.
+There are 61 reels on six shelves: animals, landmarks, art, space, flags, and names and numbers. Each game draws ten. Eight of them are size comparisons: bigger than Earth, a person, the Mona Lisa, Texas, a breadbox, a baseball or a million, and taller than the Statue of Liberty.
 
 ## Running it
 

@@ -649,6 +649,14 @@ p{margin:0}
             ['polarbear', 'The Arctic, including Alaska and northern Canada.'], ['jaguar', 'Mexico and Central America are part of North America.']],
       no: [['alpaca', 'South America.'], ['hedgehog', 'No hedgehog is native to the Americas.'], ['chameleon', 'Chameleons are Old World animals.'], ['camels', 'Central Asia.'],
            ['penguin', 'The Antarctic.'], ['koala', 'Australia.'], 'cheetah', 'giraffe', 'gorilla', 'meerkats', 'lemur', 'panda', 'redpanda', 'komodo', 'proboscis', 'gibbon', 'rhino', 'ibex', 'macaque'] },
+    { id: 'bigperson', pool: 'animals', q: 'an animal bigger than a person', nn: 'Smaller than you are.',
+      yes: [['polarbear', 'About half a ton of bear.'], ['moose', 'A bull can stand seven feet at the shoulder.'], ['bison', 'A bull can top 2,000 pounds.'], ['rhino', 'About two tons.'],
+            ['giraffe', 'Up to 18 feet tall.'], ['camels', 'Seven feet tall at the humps.'], ['horse', 'Small for a horse, and still around 800 pounds.'], ['cow', 'A Holstein: about 1,500 pounds.'],
+            ['narwhal', 'About 15 feet long, before you count the tusk.'], ['dolphin', 'A bottlenose: eight feet or more, and several hundred pounds.']],
+      no: [['dog', 'About 75 pounds.'], ['penguin', 'A chinstrap stands about two and a half feet tall.'], ['swans', 'About 25 pounds. Heavy only for something that flies.'],
+           ['koala', 'About 20 pounds.'], ['proboscis', 'A big male is about 45 pounds.'], ['gibbon', 'About 15 pounds, most of it arms.'], ['heron', 'Three feet of legs and neck, and only a few pounds.'],
+           'meerkats', 'redpanda', 'macaque', 'lemur', 'kitten', 'hedgehog', 'squirrel', 'pika', 'flyingfox', 'owl', 'kingfisher', 'harrier', 'duck', 'chickens', 'gosling', 'bee', 'butterfly',
+           'caterpillar', 'crab', 'chameleon', 'aracari', 'macaw', 'spoonbills'] },
     // ---- landmarks
     { id: 'france', pool: 'landmarks', q: 'a landmark in France',
       yes: ['eiffel', 'montstmichel', 'chambord', 'chenonceau', 'carcassonne', 'pontdugard', 'notredame', 'louvre'],
@@ -724,6 +732,14 @@ p{margin:0}
            ['brandenburg', 'A city gate.'], ['sumter', 'A sea fort.'], ['worms', 'A cathedral.'], ['reims', 'A cathedral.'], ['notredame', 'A cathedral.'], ['berlindom', 'A church.'],
            ['hawa', 'A palace front: five storeys of windows.'], 'capitol', 'taj', 'colosseum', 'parthenon', 'pisa', 'opera', 'eiffel', 'empire', 'rushmore', 'lincoln', 'golden', 'qutub',
            'charminar', 'konark', 'gateway', 'victoria', 'redeemer', 'chichen', 'gizapyr', 'pontdugard', 'arles'] },
+    { id: 'tallliberty', pool: 'landmarks', q: 'something taller than the Statue of Liberty (305 feet)', nn: 'Not as tall.',
+      yes: [['eiffel', 'About 1,080 feet: three and a half Statues of Liberty.'], ['empire', '1,454 feet to the tip.'], ['gizapyr', 'About 455 feet, and it used to be taller.'],
+            ['giza3', 'Two of the three are over 440 feet.'], ['redpyr', 'About 345 feet.'], ['bent', 'Around 340 feet, bend and all.']],
+      no: [['liberty', 'Exactly as tall as the Statue of Liberty: 305 feet, torch to ground.'], ['capitol', 'Close: 288 feet.'], ['taj', '240 feet.'], ['qutub', '238 feet.'], ['towerbridge', '213 feet.'],
+           ['pisa', '186 feet, on the high side.'], ['colosseum', '157 feet.'], ['redeemer', '125 feet with its pedestal. The mountain does the rest.'], ['lincoln', '99 feet.'], ['chichen', '98 feet.'],
+           ['brandenburg', '85 feet.'], ['gateway', '85 feet.'], ['louvre', '71 feet.'], ['hawa', '50 feet.'], ['parthenon', '45 feet of temple, on about 500 feet of hill.'],
+           ['greatwall', 'Long, not tall: mostly under 30 feet.'], 'opera', 'neuschwanstein', 'meidum', 'reims', 'victoria', 'mysore', 'nagoya', 'konark', 'arles', 'pontdugard', 'chambord', 'papes',
+           'winter', 'golden', 'stupa', 'charminar', 'egeskov', 'eilean', 'sumter', 'sanmarcos'] },
     // ---- art
     { id: 'fuji', pool: 'art', x: 'japan', q: 'a picture with Mount Fuji in it', nn: 'No Fuji in this one.',
       yes: [['art-wave', 'Small and snow-capped, in the trough of the wave.'], ['art-ejiri', 'Drawn in a single thin line, behind the wind.'], ['art-kazusa', 'A white speck on the horizon.'],
@@ -754,6 +770,12 @@ p{margin:0}
       no: [['art-wave', 'About 1831.'], ['art-kandinsky', '1923.'], ['art-galette', '1876.'], ['art-vangogh', '1890.'], ['art-piano', '1892.'], ['art-cassatt', '1894.'], ['art-bazille', '1867.'],
            ['art-ejiri', 'The early 1830s.'], ['art-kazusa', 'The early 1830s.'], ['art-ryogoku', 'The early 1830s.'], ['art-poppies', 'The 1830s.'],
            'art-inokashira', 'art-prawns', 'art-oiran', 'art-fan'] },
+    { id: 'bigmona', pool: 'art', q: 'an artwork bigger than the Mona Lisa', nn: 'Smaller than the Mona Lisa.',
+      yes: [['art-galette', 'About four feet by six.'], ['art-piano', 'Nearly four feet tall.'], ['art-harvesters', 'About four feet by five.'], ['art-kandinsky', 'Six and a half feet wide.'],
+            ['art-librarian', 'About 38 inches by 28.'], ['art-pieta', 'Nearly six feet tall, and marble.'], ['art-bellini', 'The whole altarpiece is more than eight feet tall.']],
+      no: [['art-monalisa', 'Exactly the size of the Mona Lisa: 30 inches by 21.'], ['art-wave', 'About 10 inches by 15. Smaller than a place mat.'], ['art-durer', 'A miniature on parchment: about 5 inches by 7.'],
+           ['art-ejiri', 'A print about 10 inches by 15.'], ['art-kazusa', 'A print about 10 inches by 15.'], ['art-ryogoku', 'A print about 10 inches by 15.'], ['art-poppies', 'A print about 10 inches by 15.'],
+           ['art-prawns', 'A print about 10 inches by 15.'], 'art-inokashira'] },
     // ---- space
     { id: 'bigger', pool: 'planets', x: 'planets', q: 'a planet bigger than Earth',
       yes: [['jupiter', 'Eleven Earths wide.'], ['saturn', 'Nine Earths wide, not counting the rings.'], ['uranus', 'Four Earths wide.'], ['neptune', 'Nearly four Earths wide.']],
@@ -818,6 +840,15 @@ p{margin:0}
            ['flag-hu', 'Three stripes, but horizontal ones.'], ['flag-lt', 'Three stripes, but horizontal ones.'], ['flag-th', 'Five stripes, and horizontal ones.'],
            ['flag-us', 'Thirteen stripes, all horizontal.'], ['flag-dz', 'Two halves, not three stripes.'], ['flag-pt', 'Two bands, not three.']]
           .concat(F('co in et gh eg ye es bo hr ar jp ch gb br cn kr tr gr cu')) },
+    { id: 'texas', pool: 'flags', q: 'a country bigger than Texas', yn: 'Bigger than Texas.', nn: 'Smaller than Texas.',
+      yes: [['flag-us', 'Texas is about 7% of it.'], ['flag-ru', 'About 25 Texases.'], ['flag-ca', 'About 14 Texases.'], ['flag-cn', 'About 14 Texases.'], ['flag-br', 'About 12 Texases.'],
+            ['flag-au', 'About 11 Texases.'], ['flag-in', 'Nearly five Texases.'], ['flag-ar', 'Four Texases.'], ['flag-dz', 'The largest country in Africa: more than three Texases.'],
+            ['flag-mx', 'Nearly three Texases.'], ['flag-eg', 'Nearly one and a half Texases.'], ['flag-tr', 'About an eighth bigger.'], ['flag-cl', 'Barely: about 9% bigger, and very thin.']]
+           .concat(F('sa id pe et bo tz ng ve pk co za')),
+      no: [['flag-fr', 'Mainland France is about four-fifths of Texas.'], ['flag-ke', 'Close: about five-sixths of Texas.'], ['flag-es', 'Under three-quarters of Texas.'],
+           ['flag-th', 'About three-quarters of Texas.'], ['flag-se', 'About two-thirds of Texas.'], ['flag-jp', 'A little over half of Texas.'], ['flag-de', 'About half of Texas.'],
+           ['flag-it', 'Under half of Texas.'], ['flag-gb', 'About a third of Texas.']]
+          .concat(F('no fi py ec uy gh sn ph my nz kr gr pt nl be ch ie is hu ro lt hr ge cu jm do hn gt cr pa fj tv ws to lr gy sr ci ye')) },
     // ---- words: names and numbers on title slides
     { id: 'egot', pool: 'words', words: true, q: 'an EGOT winner',
       yes: [['Mel Brooks', 'Completed the set in 2001 with Tonys for The Producers.'], ['Whoopi Goldberg', 'Completed the set in 2002 with a Tony as a producer of Thoroughly Modern Millie.'],
@@ -944,6 +975,39 @@ p{margin:0}
            ['Pilcrow', 'The paragraph mark.'], ['Octothorpe', 'The # sign.'], ['Majuscule', 'A capital letter.'], ['Vellum', 'Fine parchment.'], ['Moleskine', 'A notebook.'], ['Sharpie', 'A marker.'],
            ['Vignelli', 'A designer, famous for getting by on a handful of typefaces.'], ['Paul Rand', 'A designer: the IBM logo, among others.'], ['Saul Bass', 'A designer of film titles and logos.'],
            ['Dieter Rams', 'A designer of radios and shelves.']] },
+    { id: 'breadbox', pool: 'words', words: true, x: 'bigwords', q: 'something bigger than a breadbox', yn: 'Bigger than a breadbox.', nn: 'It would fit in a breadbox.',
+      yes: ['A grand piano', 'A giraffe', 'A school bus', 'A sofa', 'A canoe', 'A refrigerator', 'A phone booth', 'A surfboard', 'A bathtub', 'A cello', 'A tuba', 'A bicycle', 'A mattress',
+            'A Christmas tree', 'A golden retriever', 'An ironing board', 'A park bench', ['A baguette', 'Too long to fit, as anyone who has tried knows.'],
+            ['A stop sign', 'Thirty inches across. It only looks small from the car.'], ['A traffic light', 'About three and a half feet tall. It only looks small from the car.'],
+            ['The Mona Lisa', 'Thirty inches tall. Small for a legend, big for a breadbox.']],
+      no: [['A breadbox', 'Exactly the size of a breadbox.'], ['A loaf of bread', 'That is the idea.'], ['A football', 'Eleven inches long. In it goes.'], ['A brick', 'About eight inches long.'],
+           ['A Rubik\'s Cube', 'Two and a quarter inches a side.'], 'A hedgehog', 'A hamster', 'A deck of cards', 'A baseball', 'A teacup', 'A stapler', 'A golf ball', 'A harmonica', 'A lightbulb',
+           'A paperback', 'An egg', 'A wristwatch', 'A chess pawn', 'A croissant', 'A bagel', 'A stick of butter', 'A coffee mug', 'A doorknob', 'A hockey puck', 'A pair of dice', 'A bar of soap',
+           'A sparrow', 'A goldfish', 'A lemon'] },
+    { id: 'baseball', pool: 'words', words: true, x: 'bigwords', q: 'a ball bigger than a baseball', yn: 'Bigger than a baseball.', nn: 'Smaller than a baseball.',
+      yes: [['Basketball', 'About nine and a half inches across.'], ['Bowling ball', 'Eight and a half inches across.'], ['Softball', 'Bigger, and not soft.'], ['Bocce ball', 'A bit over four inches across.'],
+            ['Croquet ball', 'About three and five-eighths inches. A baseball is under three.'], ['Shot put', 'Four to five inches of solid metal.'], ['Football', 'Not round, but bigger: about 11 inches long.'],
+            ['Wrecking ball', 'Considerably.'], 'Soccer ball', 'Volleyball', 'Beach ball', 'Medicine ball', 'Dodgeball', 'Kickball', 'Rugby ball', 'Water polo ball', 'Tetherball', 'Disco ball'],
+      no: [['Baseball', 'Exactly the size of a baseball.'], ['Tennis ball', 'A little smaller: about 2.6 inches across, to a baseball\'s 2.9.'], ['Golf ball', '1.68 inches across.'],
+           ['Ping-pong ball', '40 millimetres: about an inch and a half.'], ['Billiard ball', 'Two and a quarter inches.'], ['Lacrosse ball', 'About two and a half inches.'],
+           ['Racquetball', 'Two and a quarter inches.'], ['Squash ball', 'About an inch and a half.'], ['Snooker ball', 'A bit over two inches.'], ['Hacky sack', 'About two inches.'],
+           ['Eyeball', 'About an inch across.'], ['Pinball', 'A steel ball about an inch across.'], ['Paintball', 'About two-thirds of an inch.'], ['Meatball', 'Not unless something has gone wrong.'],
+           'Gumball', 'Mothball', 'Marble', 'Malt ball'] },
+    { id: 'million', pool: 'words', words: true, q: 'something bigger than a million', nn: 'Under a million.',
+      yes: [['Seconds in two weeks', '1,209,600. A million seconds is about eleven and a half days.'], ['Seconds in a year', 'About 31.5 million.'], ['Minutes in two years', '1,051,200.'],
+            ['Heartbeats in a year', 'About 37 million, at 70 a minute.'], ['Hours since 1776', 'About 2.2 million.'], ['Days since the Great Pyramid went up', 'About 1.7 million.'],
+            ['Possible poker hands', '2,598,960.'], ['Ways to shelve ten books', '3,628,800.'], ['Ways to shuffle a deck of cards', 'An 8 followed by 67 zeros.'],
+            ['Positions of a Rubik\'s Cube', 'About 43 quintillion.'], ['Pixels on a 1080p screen', '2,073,600.'], ['Bricks in the Empire State Building', 'About 10 million.'],
+            ['Rivets in the Eiffel Tower', 'About 2.5 million.'], ['Blocks in the Great Pyramid', 'About 2.3 million.'], ['Words in the Harry Potter books', 'About 1.08 million, across all seven.'],
+            ['Feet from New York to Los Angeles', 'About 13 million, as the crow flies.'], ['Two to the twentieth power', '1,048,576.'], ['A googol', 'A one followed by a hundred zeros.'],
+            ['Neurons in your brain', 'About 86 billion.']],
+      no: [['A thousand thousands', 'Exactly a million. Not bigger.'], ['Seconds in a week', '604,800.'], ['Seconds in a day', '86,400.'], ['Minutes in a year', '525,600. Rent has a song about it.'],
+           ['Hours in a century', 'About 877,000.'], ['Hours in an 80-year life', 'About 700,000.'], ['Days since the year 1', 'About 740,000.'], ['Inches in a mile', '63,360.'], ['Feet in a mile', '5,280.'],
+           ['Inches up Mount Everest', 'About 348,000.'], ['Possible games of tic-tac-toe', '255,168.'], ['Ways to shelve nine books', '362,880.'], ['Pixels on a 720p screen', '921,600. Close.'],
+           ['Pixels on the first Macintosh screen', '175,104: 512 by 342.'], ['Steps up the Eiffel Tower', '1,665.'], ['Windows in the Empire State Building', '6,514.'],
+           ['Hairs on your head', 'About 100,000.'], ['Heartbeats in a day', 'About 100,000.'], ['Words in War and Peace', 'Under 600,000.'], ['Words in The Lord of the Rings', 'Under half a million.'],
+           ['Words in the King James Bible', 'Just under 800,000.'], ['Dollars in a Monopoly bank', 'About $20,000.'], ['Two to the tenth power', '1,024.'], ['A dozen dozen dozens', '1,728.'],
+           ['Keys on a piano', '88.'], ['Bones in your body', '206.']] },
     { id: 'prime', pool: 'words', words: true, num: true, q: 'a prime number', yn: 'Divisible by 1 and itself, and nothing else.',
       yes: [53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149].map(String),
       no: [1, 9, 15, 21, 25, 27, 33, 35, 39, 45, 49, 51, 55, 57, 63, 65, 69, 75, 77, 81, 85, 87, 91, 93, 95, 99, 111, 117, 119, 121, 123, 129, 133, 141, 143, 147, 153, 161, 169, 187].map(String) }
@@ -1210,8 +1274,16 @@ p{margin:0}
     span.style.fontSize = size + 'px';
     for (let i = 0; i < 14 && span.offsetHeight > H * 0.84; i++) { size *= 0.9; span.style.fontSize = size + 'px'; }
   }
+  // The name on the result slip: its longest unbreakable run has to fit the column beside the photo.
+  function fitResName() {
+    const el = $('resName'); el.style.fontSize = '';
+    const w = el.clientWidth; if (!w) return;
+    const base = parseFloat(getComputedStyle(el).fontSize) || 20;
+    let em = 0; for (const t of el.textContent.split(/[ -]/)) em = Math.max(em, emWidth(el, t));
+    if (em * base > w) el.style.fontSize = Math.max(base * 0.6, Math.floor(w / em * 10) / 10) + 'px';
+  }
   function refit() {
-    measure(); fitMark();
+    measure(); fitMark(); fitResName();
     const c = document.querySelector('#slide .card'); if (c) fitCard(c);
     const w = $('win'); if (w && w.clientHeight) $('leadNum').style.fontSize = Math.round(w.clientHeight * 0.6) + 'px';
   }
@@ -1591,6 +1663,7 @@ p{margin:0}
     const last = state.round >= state.total;
     $('nextBtn').textContent = last ? 'Final scores' : 'Next round';
     show('result', roundPair(), instant);
+    fitResName();
     if (!last) warmNext();
   }
 
