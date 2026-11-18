@@ -9,7 +9,7 @@ A party-game prototype. Each round names one thing to wait for: a carnivore, a l
 - If the right slide goes by untapped, nobody scores.
 - Ten rounds. Most points wins.
 
-There are 61 reels on six shelves: animals, landmarks, art, space, flags, and names and numbers. Each game draws ten. Eight of them are size comparisons: bigger than Earth, a person, the Mona Lisa, Texas, a breadbox, a baseball or a million, and taller than the Statue of Liberty.
+There are 91 reels on seven shelves: animals, landmarks, art, space, flags, names and numbers, and memory. Each game draws ten. The three memory reels (a repeated picture, a word out of alphabetical order, a number that drops) have no fixed slides: `genRound` makes each round up, and the right slide is right only because of what came before it. Eight of them are size comparisons: bigger than Earth, a person, the Mona Lisa, Texas, a breadbox, a baseball or a million, and taller than the Statue of Liberty.
 
 ## Running it
 
@@ -29,7 +29,7 @@ Everything below is in the one `<script>` block in `index.html`.
     no:  [['koala', 'Not a bear. Koalas are marsupials.'], 'bison', 'gorilla', 'moose'] }
   ```
 
-  `yes` are the slides that count and `no` the ones that don't. An entry is a slide id, or `[id, 'a line for the result slip']` when there is something worth saying. `yn` and `nn` are the lines used when an entry has none. `pool` is the shelf the reel sits on (`animals`, `landmarks`, `art`, `planets`, `flags`, `words`), and `x` marks reels too alike to both turn up in one game.
+  `yes` are the slides that count and `no` the ones that don't. An entry is a slide id, or `[id, 'a line for the result slip']` when there is something worth saying. `yn` and `nn` are the lines used when an entry has none. `pool` is the shelf the reel sits on (`animals`, `landmarks`, `art`, `planets`, `flags`, `words`, `memory`), and `x` marks reels too alike to both turn up in one game.
 - **Word reels** (`words: true`) flash names or numbers on title slides and need no images. Their entries are the text itself.
 - **Slides** are 900 × 600 WebP files, the 3:2 of a 35mm slide. To add one, put `name.webp` in `img/`, give it a display name in `NAMES`, and list `name` in a reel.
 - **The rules as numbers** are the constants at the top of the script: rounds per game, the 30-second ceiling, the three paces, the quick-draw window, how long a wrong tap freezes the reel, and how many reels each game takes from each shelf (`MIX`).

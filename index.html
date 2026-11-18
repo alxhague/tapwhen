@@ -454,7 +454,7 @@ p{margin:0}
       <div class="group">
         <div class="eyebrow">Rounds</div>
         <div class="opts">
-          <button class="opt" id="mixAll" type="button"><span class="t">Photos and words</span><span class="d">Eight photo rounds and two of names or numbers.</span></button>
+          <button class="opt" id="mixAll" type="button"><span class="t">Photos and words</span><span class="d">Six photo rounds, three of names or numbers, and one memory round.</span></button>
           <button class="opt" id="mixPhotos" type="button"><span class="t">Photos only</span><span class="d">Animals, landmarks, art, space and flags.</span></button>
         </div>
       </div>
@@ -525,7 +525,7 @@ p{margin:0}
   const LEAD_STEP_MS = 620;     // each beat of the three, two, one
   const LATE_SHOW_MS = 1200;    // how long "Missed it" holds the screen
   const START_LOCK_MS = 150;
-  const MIX = { all: { animals: 2, landmarks: 2, art: 1, planets: 1, flags: 2, words: 2 }, photos: { animals: 3, landmarks: 3, art: 1, planets: 1, flags: 2, words: 0 } };
+  const MIX = { all: { animals: 2, landmarks: 1, art: 1, planets: 1, flags: 1, words: 3, memory: 1 }, photos: { animals: 3, landmarks: 2, art: 1, planets: 1, flags: 2, words: 0, memory: 1 } };
 
   // ───────────── the slides: what each photo is called when the machine names it ─────────────
   const NAMES = {
@@ -657,6 +657,20 @@ p{margin:0}
            ['koala', 'About 20 pounds.'], ['proboscis', 'A big male is about 45 pounds.'], ['gibbon', 'About 15 pounds, most of it arms.'], ['heron', 'Three feet of legs and neck, and only a few pounds.'],
            'meerkats', 'redpanda', 'macaque', 'lemur', 'kitten', 'hedgehog', 'squirrel', 'pika', 'flyingfox', 'owl', 'kingfisher', 'harrier', 'duck', 'chickens', 'gosling', 'bee', 'butterfly',
            'caterpillar', 'crab', 'chameleon', 'aracari', 'macaw', 'spoonbills'] },
+    { id: 'several', pool: 'animals', q: 'a photo with more than one animal in it', nn: 'Just the one.',
+      yes: [['camels', 'Two: a mother and a calf.'], ['meerkats', 'Three in a row.'], ['proboscis', 'Look lower down: there is a baby.'], ['spoonbills', 'Two.'], ['swans', 'A whole family.'],
+            ['jaguar', 'Two.'], ['lemur', 'Two, at least.'], ['narwhal', 'A pod.'], ['chickens', 'Four.'], ['cow', 'Two more in the field behind.'], ['bison', 'The rest of the herd is in the background.']],
+      no: ['bee', 'butterfly', 'calf', 'caterpillar', 'chameleon', 'cheetah', 'crab', 'dolphin', 'flyingfox', 'gibbon', 'gorilla', 'gosling', 'heron', 'horse', 'kingfisher', 'kitten', 'macaque', 'harrier',
+           'ibex', 'penguin', 'pika', 'redpanda', 'rhino', 'squirrel', 'aracari', 'crocodile', 'komodo', 'hedgehog', 'koala', 'moose', 'panda', 'polarbear', 'macaw', 'dog', 'duck', 'owl', 'sheep', 'goat'] },
+    { id: 'looking', pool: 'animals', q: 'an animal looking straight at you', yn: 'Eye contact.', nn: 'Looking somewhere else.',
+      yes: ['calf', 'kitten', 'gorilla', 'sheep', 'lemur', 'crab', 'ibex'],
+      no: ['alpaca', 'bee', 'butterfly', 'caterpillar', 'chameleon', 'giraffe', 'goat', 'heron', 'kingfisher', 'proboscis', 'macaque', 'harrier', 'rhino', 'spoonbills', 'squirrel', 'aracari', 'bison',
+           'crocodile', 'komodo', 'moose', 'narwhal', 'macaw', 'chickens', 'duck', 'polarbear', 'swans', 'camels', 'flyingfox', 'gosling', 'pika', 'cheetah', 'hedgehog', 'dog'] },
+    { id: 'midair', pool: 'animals', q: 'an animal in mid-air', yn: 'Off the ground.', nn: 'Feet down.',
+      yes: ['bee', 'heron', 'harrier', 'flyingfox'],
+      no: [['butterfly', 'It can fly, but here it has landed.'], ['kingfisher', 'It can fly, but here it is perched.'], ['owl', 'Perched.'], ['macaw', 'Perched.'], ['aracari', 'Perched.'],
+           ['gosling', 'Running, with one foot still down.'], ['swans', 'Swimming.'], ['duck', 'Standing.'], ['spoonbills', 'Wading.'], ['penguin', 'It could not if it tried.'],
+           'chickens', 'squirrel', 'gibbon', 'koala', 'kitten', 'dolphin', 'crab', 'caterpillar', 'pika', 'cheetah', 'ibex', 'horse', 'dog', 'meerkats', 'lemur'] },
     // ---- landmarks
     { id: 'france', pool: 'landmarks', q: 'a landmark in France',
       yes: ['eiffel', 'montstmichel', 'chambord', 'chenonceau', 'carcassonne', 'pontdugard', 'notredame', 'louvre'],
@@ -849,6 +863,15 @@ p{margin:0}
            ['flag-th', 'About three-quarters of Texas.'], ['flag-se', 'About two-thirds of Texas.'], ['flag-jp', 'A little over half of Texas.'], ['flag-de', 'About half of Texas.'],
            ['flag-it', 'Under half of Texas.'], ['flag-gb', 'About a third of Texas.']]
           .concat(F('no fi py ec uy gh sn ph my nz kr gr pt nl be ch ie is hu ro lt hr ge cu jm do hn gt cr pa fj tv ws to lr gy sr ci ye')) },
+    { id: 'star', pool: 'flags', q: 'a flag with a star on it', yn: 'At least one star.', nn: 'No stars.',
+      yes: [['flag-us', 'Fifty.'], ['flag-br', 'Twenty-seven, one for each state and the capital district.'], ['flag-cn', 'Five.'], ['flag-au', 'Six.'], ['flag-nz', 'Four.'], ['flag-ph', 'Three, around the sun.']]
+           .concat(F('cl cu gh sn tr pk my dz ve hn tv ws et pa lr ma sr')),
+      no: [['flag-in', 'A wheel, not a star.'], ['flag-kr', 'A yin-yang and four trigrams.'], ['flag-jp', 'A sun, drawn as a disc.'], ['flag-ca', 'A leaf.'], ['flag-ke', 'A shield and two spears.'],
+           ['flag-sa', 'Writing and a sword.'], ['flag-mx', 'An eagle on a cactus.'], ['flag-eg', 'An eagle.']]
+          .concat(F('fr it de gb ru nl se no fi dk is ch gr ie be ro hu lt co pe ng tz za jm id ye th cr ge to gy ci')) },
+    { id: 'green', pool: 'flags', q: 'a flag with green in it', yn: 'There is green.', nn: 'No green.',
+      yes: F('sa pk ng br gy jm dz ke tz sr sn za pt et gh bo ci ie it mx hu in lt'),
+      no: F('us fr gb jp ch dk ca ru nl cl cu th cr pa no is se fi gr de be ro co ar uy pe cn tr id ye kr au nz ge to hn lr ws eg ve es my ph') },
     // ---- words: names and numbers on title slides
     { id: 'egot', pool: 'words', words: true, q: 'an EGOT winner',
       yes: [['Mel Brooks', 'Completed the set in 2001 with Tonys for The Producers.'], ['Whoopi Goldberg', 'Completed the set in 2002 with a Tony as a producer of Thoroughly Modern Millie.'],
@@ -1008,6 +1031,166 @@ p{margin:0}
            ['Hairs on your head', 'About 100,000.'], ['Heartbeats in a day', 'About 100,000.'], ['Words in War and Peace', 'Under 600,000.'], ['Words in The Lord of the Rings', 'Under half a million.'],
            ['Words in the King James Bible', 'Just under 800,000.'], ['Dollars in a Monopoly bank', 'About $20,000.'], ['Two to the tenth power', '1,024.'], ['A dozen dozen dozens', '1,728.'],
            ['Keys on a piano', '88.'], ['Bones in your body', '206.']] },
+    { id: 'crayola', pool: 'words', words: true, x: 'realfake', q: 'a real Crayola crayon colour', yn: 'A real Crayola crayon.', nn: 'Not a Crayola crayon.',
+      yes: ['Macaroni and Cheese', 'Purple Mountains\' Majesty', 'Razzmatazz', 'Tickle Me Pink', 'Outer Space', 'Mauvelous', 'Jazzberry Jam', 'Fuzzy Wuzzy', 'Inchworm', 'Wild Blue Yonder', 'Timberwolf',
+            'Neon Carrot', 'Atomic Tangerine', 'Laser Lemon', 'Screamin\' Green', 'Robin\'s Egg Blue', 'Burnt Sienna', 'Granny Smith Apple', 'Unmellow Yellow', 'Manatee', 'Banana Mania', 'Electric Lime',
+            'Outrageous Orange', 'Mango Tango', 'Razzle Dazzle Rose', 'Tumbleweed', 'Purple Pizzazz'],
+      no: [['Elephant\'s Breath', 'A Farrow & Ball paint.'], ['Dead Salmon', 'A Farrow & Ball paint.'], ['Mole\'s Breath', 'A Farrow & Ball paint.'], ['Mouse\'s Back', 'A Farrow & Ball paint.'],
+           ['Sulking Room Pink', 'A Farrow & Ball paint.'], ['Vantablack', 'A coating that swallows nearly all light. Not a crayon.'], ['International Klein Blue', 'Yves Klein\'s own blue.'],
+           ['Mummy Brown', 'A real old pigment, made from real old mummies.'], ['Drunk-Tank Pink', 'A real pink, tried out on jail cells.'], ['Tiffany Blue', 'A jeweller\'s trademark.'],
+           ['Hooker\'s Green', 'A painter\'s pigment.'], ['Scheele\'s Green', 'A Victorian pigment with arsenic in it.'], ['Millennial Pink', 'A trend, not a crayon.'], ['Haint Blue', 'A porch-ceiling colour of the American South.'],
+           'Greige', 'Puce', 'Gamboge', 'Falu Red', 'Eau de Nil', 'Isabelline', 'Zaffre', 'Feldgrau'] },
+    { id: 'ikea', pool: 'words', words: true, x: 'realfake', q: 'an IKEA product', yn: 'IKEA.', nn: 'A metal band.',
+      yes: [['Billy', 'The bookcase.'], ['Kallax', 'The shelf of cubes.'], ['Malm', 'The bed and the dressers.'], ['Poäng', 'The bentwood armchair.'], ['Lack', 'The cheap side table.'], ['Ektorp', 'A sofa.'],
+            ['Hemnes', 'Bedroom furniture.'], ['Pax', 'The wardrobes.'], ['Klippan', 'A sofa.'], ['Blåhaj', 'The stuffed shark.'], ['Frakta', 'The big blue bag.'], ['Expedit', 'The shelf Kallax replaced.'],
+            ['Docksta', 'A round white table.'], ['Ingolf', 'A chair.'], ['Söderhamn', 'A sofa.'], ['Kivik', 'A sofa.'], ['Bekant', 'A desk.'], ['Brimnes', 'Beds and wardrobes.'], ['Råskog', 'The trolley.'],
+            ['Strandmon', 'The wing chair.'], ['Fejka', 'Fake plants. The name is the joke.'], ['Vittsjö', 'Glass-and-metal shelves.']],
+      no: [['Opeth', 'A Swedish metal band.'], ['Bathory', 'A Swedish metal band.'], ['Meshuggah', 'A Swedish metal band.'], ['Marduk', 'A Swedish metal band.'], ['Katatonia', 'A Swedish metal band.'],
+           ['Tiamat', 'A Swedish metal band.'], ['Therion', 'A Swedish metal band.'], ['Nifelheim', 'A Swedish metal band.'], ['Vintersorg', 'A Swedish metal band.'], ['Burzum', 'A Norwegian metal band.'],
+           ['Gorgoroth', 'A Norwegian metal band.'], ['Taake', 'A Norwegian metal band.'], ['Kvelertak', 'A Norwegian metal band.'], ['Windir', 'A Norwegian metal band.'], ['Dimmu Borgir', 'A Norwegian metal band.'],
+           ['Darkthrone', 'A Norwegian metal band.'], ['Finntroll', 'A Finnish metal band.'], ['Korpiklaani', 'A Finnish metal band.'], ['Ensiferum', 'A Finnish metal band.'], ['Moonsorrow', 'A Finnish metal band.'],
+           ['Skálmöld', 'An Icelandic metal band.'], ['Sólstafir', 'An Icelandic metal band.']] },
+    { id: 'pokemon', pool: 'words', words: true, x: 'realfake', q: 'a Pokémon', yn: 'A Pokémon.', nn: 'A medicine, not a Pokémon.',
+      yes: ['Alakazam', 'Zapdos', 'Lapras', 'Gengar', 'Snorlax', 'Togepi', 'Mewtwo', 'Vaporeon', 'Jolteon', 'Arcanine', 'Ninetales', 'Gyarados', 'Dragonite', 'Articuno', 'Moltres', 'Kadabra', 'Machamp',
+            'Rapidash', 'Lucario', 'Garchomp', 'Metagross', 'Salamence', 'Tyranitar', 'Celebi', 'Suicune', 'Raikou', 'Entei', 'Umbreon', 'Espeon', 'Zoroark', 'Hydreigon'],
+      no: [['Lipitor', 'For cholesterol.'], ['Ambien', 'For sleep.'], ['Lunesta', 'For sleep.'], ['Zoloft', 'An antidepressant.'], ['Cymbalta', 'An antidepressant.'], ['Xarelto', 'A blood thinner.'],
+           ['Eliquis', 'A blood thinner.'], ['Nexium', 'For heartburn.'], ['Claritin', 'For allergies.'], ['Ozempic', 'For diabetes.'], ['Celebrex', 'For arthritis pain. Celebi is the Pokémon.'],
+           'Xeljanz', 'Zyprexa', 'Abilify', 'Crestor', 'Humira', 'Lyrica', 'Rinvoq', 'Skyrizi', 'Trulicity', 'Jardiance', 'Farxiga', 'Entresto', 'Dupixent', 'Stelara', 'Otezla', 'Tremfya', 'Taltz'] },
+    { id: 'realperson', pool: 'words', words: true, x: 'realfake', q: 'a real person', yn: 'A real person.', nn: 'Made up.',
+      yes: [['Chef Boyardee', 'Ettore Boiardi, a real chef from Piacenza.'], ['Duncan Hines', 'A travelling salesman turned restaurant critic.'], ['Orville Redenbacher', 'Real, bow tie and all.'],
+            ['Colonel Sanders', 'Harland Sanders. The rank was honorary.'], ['Sara Lee', 'The founder\'s daughter, Sara Lee Lubin.'], ['Little Debbie', 'Debbie McKee, the founders\' granddaughter.'],
+            ['Mrs. Fields', 'Debbi Fields.'], ['Jimmy Dean', 'A country singer before the sausage.'], ['Oscar Mayer', 'A German immigrant butcher in Chicago.'], ['Famous Amos', 'Wally Amos.'],
+            ['Marie Callender', 'She sold pies in California.'], ['Dr. Scholl', 'William Scholl, a Chicago foot doctor.'], ['Jack Daniel', 'A real Tennessee distiller.'], ['Johnnie Walker', 'John Walker, a Scottish grocer.'],
+            ['Jim Beam', 'James Beauregard Beam.'], ['Earl Grey', 'The 2nd Earl Grey, a British prime minister.'], ['Granny Smith', 'Maria Ann Smith, who raised the apple in Australia.'],
+            ['Captain Morgan', 'Sir Henry Morgan, a Welsh privateer.'], ['Dr. Martens', 'Klaus Märtens, a German army doctor.'], ['Mary Kay', 'Mary Kay Ash.'], ['Dom Pérignon', 'A Benedictine monk.'],
+            ['Mama Celeste', 'Celeste Lizio, who ran a restaurant in Chicago.']],
+      no: [['Betty Crocker', 'Invented in 1921 to sign replies to baking questions.'], ['Mavis Beacon', 'A model on the box. There was never a typing teacher.'], ['Juan Valdez', 'Invented in 1958 for Colombia\'s coffee growers.'],
+           ['Ann Taylor', 'The name of a dress style. There was no Ann.'], ['Ronald McDonald', 'A clown. The McDonald brothers were real.'], ['Cap\'n Crunch', 'His full name is Horatio Magellan Crunch. Still not real.'],
+           ['Mrs. Butterworth', 'A bottle.'], ['Mr. Clean', 'A mascot.'], ['Mr. Peanut', 'A mascot.'], ['Count Chocula', 'A cereal.'], ['Dr Pepper', 'A drink. Nobody is sure who it was named for.'],
+           ['Mother Goose', 'Nobody has ever found her.'], ['Paul Bunyan', 'A tall tale.'], ['Alfred E. Neuman', 'Mad magazine\'s cover boy.'], ['Sherlock Holmes', 'Arthur Conan Doyle\'s.'], ['Don Draper', 'Mad Men.'],
+           ['Carmen Sandiego', 'A game.'], ['Mrs. Doubtfire', 'A film.'], 'Forrest Gump', 'Ron Burgundy', 'Tony Soprano', 'Lara Croft', 'Jay Gatsby', 'Atticus Finch', 'Tom Sawyer'] },
+    { id: 'muppet', pool: 'words', words: true, x: 'poplist', q: 'a Muppet', yn: 'A Muppet.', nn: 'Not a Muppet.',
+      yes: ['Kermit', 'Miss Piggy', 'Fozzie Bear', 'Gonzo', 'Animal', 'Rowlf', 'Scooter', 'Statler', 'Waldorf', 'Beaker', 'The Swedish Chef', 'Rizzo', 'Sam Eagle', 'Janice', 'Dr. Teeth', 'Zoot', 'Camilla',
+            'Sweetums', 'Lew Zealand', ['Elmo', 'The Sesame Street characters are Muppets too.'], ['Big Bird', 'The Sesame Street characters are Muppets too.'], ['Grover', 'The Sesame Street characters are Muppets too.'],
+            ['Cookie Monster', 'The Sesame Street characters are Muppets too.'], ['Oscar the Grouch', 'The Sesame Street characters are Muppets too.'], ['Count von Count', 'The Sesame Street characters are Muppets too.']],
+      no: [['Yoda', 'Performed by Frank Oz, who was also Miss Piggy. Not a Muppet.'], ['ALF', 'A puppet, but not a Muppet.'], ['Lamb Chop', 'Shari Lewis\'s sock puppet.'], ['Howdy Doody', 'A marionette from the 1950s.'],
+           ['Mr. Hooper', 'A human on Sesame Street.'], ['Daniel Striped Tiger', 'From Mister Rogers\' Neighborhood.'], ['King Friday XIII', 'From Mister Rogers\' Neighborhood.'], ['Barney', 'A person in a dinosaur suit.'],
+           ['Charlie McCarthy', 'A ventriloquist\'s dummy.'], ['Count Chocula', 'A cereal. The Muppet is Count von Count.'], ['Topo Gigio', 'An Italian mouse puppet.'], ['Punch', 'As in Punch and Judy.'],
+           'Pinocchio', 'Garfield', 'Snoopy', 'Paddington', 'Gumby', 'Wallace', 'Chucky', 'Mr. Bean'] },
+    { id: 'bestpicture', pool: 'words', words: true, x: 'poplist', q: 'a Best Picture winner', yn: 'It won Best Picture.', nn: 'It did not win Best Picture.',
+      yes: ['Casablanca', 'The Godfather', 'Titanic', 'Gladiator', 'Rocky', 'Forrest Gump', 'Schindler\'s List', 'The Silence of the Lambs', 'Parasite', 'Moonlight', 'Chicago', 'Annie Hall', 'Rain Man', 'Braveheart',
+            'The Sound of Music', 'Lawrence of Arabia', 'Ben-Hur', 'Gone with the Wind', 'No Country for Old Men', 'The Departed', 'Spotlight', 'Argo', 'The King\'s Speech', 'Shakespeare in Love', 'Crash',
+            'Oppenheimer', 'Green Book', 'Nomadland', 'CODA'],
+      no: [['Citizen Kane', 'It lost to How Green Was My Valley.'], ['Star Wars', 'It lost to Annie Hall.'], ['Pulp Fiction', 'It lost to Forrest Gump.'], ['The Shawshank Redemption', 'It lost to Forrest Gump.'],
+           ['Saving Private Ryan', 'It lost to Shakespeare in Love.'], ['Goodfellas', 'It lost to Dances with Wolves.'], ['La La Land', 'Announced as the winner by mistake. Moonlight won.'],
+           ['Brokeback Mountain', 'It lost to Crash.'], ['E.T.', 'It lost to Gandhi.'], ['Raging Bull', 'It lost to Ordinary People.'], ['Taxi Driver', 'It lost to Rocky.'], ['Apocalypse Now', 'It lost to Kramer vs. Kramer.'],
+           ['Fargo', 'It lost to The English Patient.'], ['The Social Network', 'It lost to The King\'s Speech.'], ['Jaws', 'It lost to One Flew Over the Cuckoo\'s Nest.'], ['The Wizard of Oz', 'It lost to Gone with the Wind.'],
+           ['It\'s a Wonderful Life', 'It lost to The Best Years of Our Lives.'], ['Avatar', 'It lost to The Hurt Locker.'], ['Barbie', 'It lost to Oppenheimer.'], ['Psycho', 'Not even nominated.'], ['Vertigo', 'Not even nominated.'],
+           ['Singin\' in the Rain', 'Not even nominated.'], ['2001: A Space Odyssey', 'Not even nominated.'], ['The Dark Knight', 'Not even nominated.'], ['Do the Right Thing', 'Not even nominated.']] },
+    { id: 'medals', pool: 'words', words: true, x: 'poplist', q: 'something that has won people Olympic medals', nn: 'Never a medal event.',
+      yes: [['Tug of war', 'From 1900 to 1920.'], ['Croquet', 'Paris, 1900.'], ['Polo', 'Five Games, the last in 1936.'], ['Cricket', 'Once, in 1900.'], ['Lacrosse', 'In 1904 and 1908.'], ['Painting', 'There were art medals from 1912 to 1948.'],
+            ['Poetry', 'There were literature medals from 1912 to 1948.'], ['Live pigeon shooting', 'Paris, 1900. Once was enough.'], ['Breaking', 'Paris, 2024.'], ['Karate', 'Tokyo, and only Tokyo.'], ['Trampoline', 'Since 2000.'],
+            'Golf', 'Rugby', 'Curling', 'Skeleton', 'Badminton', 'Table tennis', 'Handball', 'Water polo', 'Skateboarding', 'Surfing', 'Sport climbing', 'Baseball', 'Softball', 'Beach volleyball', 'Taekwondo', 'Luge', 'Biathlon'],
+      no: [['Bowling', 'A demonstration in 1988. No medals.'], 'Darts', 'Chess', 'Pickleball', 'Ultimate frisbee', 'Cheerleading', 'Billiards', 'Netball', 'Kabaddi', 'Sumo', 'Dodgeball', 'Bodybuilding', 'Arm wrestling',
+           'Roller derby', 'Paintball', 'Poker', 'Quidditch', 'Cornhole', 'Kickball', 'Bocce', 'Mini golf', 'Disc golf', 'Parkour'] },
+    { id: 'pasta', pool: 'words', words: true, x: 'poplist', q: 'a pasta shape', yn: 'Pasta.', nn: 'A composer, not a pasta.',
+      yes: [['Orecchiette', 'Little ears.'], ['Farfalle', 'Butterflies.'], ['Strozzapreti', 'Priest-stranglers.'], ['Vermicelli', 'Little worms.'], ['Linguine', 'Little tongues.'], ['Conchiglie', 'Shells.'],
+            ['Campanelle', 'Little bells.'], ['Gemelli', 'Twins.'], ['Radiatori', 'Radiators.'], ['Ditalini', 'Little thimbles.'], ['Cavatappi', 'Corkscrews.'], ['Capellini', 'Fine hairs.'], ['Penne', 'Quills.'],
+            'Rigatoni', 'Fusilli', 'Bucatini', 'Tagliatelle', 'Pappardelle', 'Rotini', 'Tortellini', 'Fettuccine', 'Mafaldine', 'Paccheri', 'Casarecce', 'Cannelloni', 'Manicotti'],
+      no: [['Puccini', 'He wrote La Bohème.'], ['Rossini', 'He wrote The Barber of Seville.'], ['Vivaldi', 'He wrote The Four Seasons.'], ['Verdi', 'He wrote La Traviata.'], ['Paganini', 'A violinist and composer.'],
+           ['Respighi', 'He wrote Pines of Rome.'], ['Leoncavallo', 'He wrote Pagliacci.'], ['Mascagni', 'He wrote Cavalleria rusticana.'], ['Morricone', 'Film scores.'], ['Toscanini', 'A conductor.'], ['Pavarotti', 'A tenor.'],
+           ['Stradivari', 'A violin maker.'], 'Donizetti', 'Monteverdi', 'Scarlatti', 'Corelli', 'Albinoni', 'Boccherini', 'Clementi', 'Tartini', 'Pergolesi', 'Cherubini', 'Salieri', 'Busoni', 'Palestrina', 'Frescobaldi'] },
+    { id: 'telephone', pool: 'words', words: true, x: 'beforeafter', q: 'something invented before the telephone', yn: 'Before 1876.', nn: 'After the telephone, which came in 1876.',
+      yes: [['The fax machine', 'Patented in 1843. Really.'], ['The typewriter', '1868.'], ['Blue jeans', '1873.'], ['Barbed wire', '1874.'], ['Dynamite', '1867.'], ['The safety pin', '1849.'], ['The sewing machine', '1846.'],
+            ['The saxophone', 'The 1840s.'], ['The postage stamp', '1840.'], ['The telegraph', '1837.'], ['The revolver', '1836.'], ['The photograph', '1826.'], ['Braille', '1824.'], ['The bicycle', '1817.'],
+            ['The stethoscope', '1816.'], ['The steam locomotive', '1804.'], ['The battery', '1800.'], ['The hot-air balloon', '1783.'], ['Roller skates', 'The 1760s.'], ['The can opener', '1855, decades after the can.'],
+            ['The rubber band', '1845.'], ['The elevator brake', '1850s.']],
+      no: [['The phonograph', '1877. One year later.'], ['The cash register', '1879.'], ['The electric fan', '1882.'], ['The automobile', '1885.'], ['The motorcycle', '1885.'], ['Coca-Cola', '1886.'], ['The dishwasher', '1886.'],
+           ['The ballpoint pen', 'First patented in 1888.'], ['Basketball', '1891.'], ['The escalator', '1892.'], ['The zipper', '1893.'], ['The Ferris wheel', '1893.'], ['Radio', 'The 1890s.'], ['The X-ray', '1895.'],
+           ['Volleyball', '1895.'], ['Aspirin', '1897.'], ['The vacuum cleaner', '1901.'], ['Air conditioning', '1902.'], ['The teddy bear', '1902.'], ['The airplane', '1903.'], ['The crossword', '1913.'], ['The Band-Aid', '1920.']] },
+    { id: 'starwars', pool: 'words', words: true, x: 'beforeafter', q: 'a film older than Star Wars', yn: 'Before May 1977.', nn: 'After Star Wars, which opened in May 1977.',
+      yes: [['Annie Hall', 'By about five weeks.'], ['Rocky', '1976.'], ['Taxi Driver', '1976.'], ['Carrie', '1976.'], ['Network', '1976.'], ['Jaws', '1975.'], ['Monty Python and the Holy Grail', '1975.'],
+            ['One Flew Over the Cuckoo\'s Nest', '1975.'], ['The Rocky Horror Picture Show', '1975.'], ['Chinatown', '1974.'], ['Blazing Saddles', '1974.'], ['Young Frankenstein', '1974.'], ['The Exorcist', '1973.'],
+            ['American Graffiti', '1973. George Lucas made it first.'], ['The Sting', '1973.'], ['The Godfather', '1972.'], ['A Clockwork Orange', '1971.'], ['2001: A Space Odyssey', '1968.'], ['Planet of the Apes', '1968.'],
+            ['Psycho', '1960.'], ['Casablanca', '1942.']],
+      no: [['Close Encounters of the Third Kind', 'Six months later.'], ['Saturday Night Fever', 'December 1977.'], ['Grease', '1978.'], ['Superman', '1978.'],
+           ['Halloween', '1978.'], ['Animal House', '1978.'], ['Jaws 2', '1978.'], ['The Deer Hunter', '1978.'], ['Alien', '1979.'], ['Apocalypse Now', '1979.'], ['Mad Max', '1979.'], ['Rocky II', '1979.'],
+           ['The Muppet Movie', '1979.'], ['Kramer vs. Kramer', '1979.'], ['The Shining', '1980.'], ['Airplane!', '1980.'], ['Raging Bull', '1980.'], ['Raiders of the Lost Ark', '1981.'], ['Blade Runner', '1982.'], ['E.T.', '1982.']] },
+    { id: 'lincoln', pool: 'words', words: true, x: 'beforeafter', q: 'someone alive at the same time as Abraham Lincoln', yn: 'Their lives overlapped with his, 1809 to 1865.', nn: 'No overlap with Lincoln, 1809 to 1865.',
+      yes: [['Charles Darwin', 'Born on the very same day.'], ['Napoleon', 'He died in 1821, when Lincoln was twelve.'], ['Beethoven', 'He died in 1827.'], ['Thomas Jefferson', 'He died in 1826.'], ['Jane Austen', 'She died in 1817.'],
+            ['Hokusai', 'He died in 1849.'], ['Sigmund Freud', 'Born in 1856.'], ['Vincent van Gogh', 'Born in 1853.'], ['Thomas Edison', 'Born in 1847.'], ['Henry Ford', 'Born in 1863.'], ['Arthur Conan Doyle', 'Born in 1859.'],
+            ['Billy the Kid', 'Born around 1859.'], ['Oscar Wilde', 'Born in 1854.'], ['Claude Monet', 'Born in 1840.'], ['Theodore Roosevelt', 'Born in 1858. He watched Lincoln\'s funeral procession as a boy.'],
+            'Queen Victoria', 'Karl Marx', 'Charles Dickens', 'Edgar Allan Poe', 'Mark Twain', 'Harriet Tubman', 'Frederick Douglass', 'Emily Dickinson', 'Florence Nightingale', 'Geronimo'],
+      no: [['George Washington', 'He died in 1799.'], ['Benjamin Franklin', 'He died in 1790.'], ['Mozart', 'He died in 1791.'], ['Marie Antoinette', 'She died in 1793.'], ['Catherine the Great', 'She died in 1796.'],
+           ['Marie Curie', 'Born in 1867.'], ['Frank Lloyd Wright', 'Born in 1867.'], ['The Wright brothers', 'Born in 1867 and 1871.'], ['Gandhi', 'Born in 1869.'], ['Winston Churchill', 'Born in 1874.'], ['Harry Houdini', 'Born in 1874.'],
+           ['Albert Einstein', 'Born in 1879.'], ['Helen Keller', 'Born in 1880.'], ['Pablo Picasso', 'Born in 1881.'], ['Franklin Roosevelt', 'Born in 1882.'], ['Charlie Chaplin', 'Born in 1889.'], ['Babe Ruth', 'Born in 1895.'],
+           ['Voltaire', 'He died in 1778.'], ['Johann Sebastian Bach', 'He died in 1750.'], ['Isaac Newton', 'He died in 1727.'], ['Adam Smith', 'He died in 1790.']] },
+    { id: 'palindrome', pool: 'words', words: true, x: 'letters', q: 'a palindrome', yn: 'The same backwards.', nn: 'Not the same backwards.',
+      yes: ['Racecar', 'Kayak', 'Rotator', 'Deified', 'Reviver', 'Redder', 'Civic', 'Stats', 'Tenet', 'Solos', 'Hannah', 'Taco cat', 'Never odd or even', 'A Santa at NASA', 'Step on no pets', 'Do geese see God',
+            'No lemon, no melon', 'Borrow or rob', 'Yo, banana boy', 'Madam, I\'m Adam', 'A Toyota', ['Aibohphobia', 'The joke word for a fear of palindromes.']],
+      no: [['Stressed', 'Backwards it spells desserts, which is a different word.'], ['Drawer', 'Backwards it spells reward.'], ['Diaper', 'Backwards it spells repaid.'], ['Live', 'Backwards it spells evil.'],
+           ['Parts', 'Backwards it spells strap.'], ['Lever', 'Backwards it spells revel.'], ['Palindrome', 'Backwards it spells emordnilap.'], ['Minimum', 'Close. Backwards it is muminim.'],
+           ['Referee', 'Refer is one. Referee is not.'], ['Kayaks', 'Kayak is one. The s spoils it.'], ['Racetrack', 'Racecar is the one.'], ['Rotors', 'Rotor is one. The s spoils it.'],
+           'Banana', 'Mississippi', 'Abracadabra', 'Level up', 'Radars', 'Mirror', 'Reverse', 'Backwards'] },
+    { id: 'misspelled', pool: 'words', words: true, x: 'letters', q: 'a word spelled wrong', nn: 'Spelled correctly.',
+      yes: [['Accomodate', 'Two Cs and two Ms: accommodate.'], ['Seperate', 'Separate.'], ['Definately', 'Definitely.'], ['Occurence', 'Occurrence.'], ['Recieve', 'Receive.'], ['Embarass', 'Embarrass.'], ['Neccessary', 'Necessary.'],
+            ['Millenium', 'Millennium.'], ['Mispell', 'Misspell.'], ['Calender', 'Calendar.'], ['Cemetary', 'Cemetery.'], ['Concensus', 'Consensus.'], ['Liason', 'Liaison.'], ['Wierd', 'Weird.'], ['Tommorow', 'Tomorrow.'],
+            ['Goverment', 'Government.'], ['Priviledge', 'Privilege.'], ['Maintainance', 'Maintenance.'], ['Supercede', 'Supersede.'], ['Harrass', 'Harass.'], ['Existance', 'Existence.'], ['Arguement', 'Argument.'],
+            ['Acheive', 'Achieve.'], ['Rythm', 'Rhythm.'], ['Vaccum', 'Vacuum.'], ['Minature', 'Miniature.'], ['Pharoah', 'Pharaoh.'], ['Sacreligious', 'Sacrilegious.'], ['Restaraunt', 'Restaurant.'], ['Indispensible', 'Indispensable.']],
+      no: ['Accommodate', 'Separate', 'Definitely', 'Occurrence', 'Receive', 'Embarrass', 'Necessary', 'Millennium', 'Misspell', 'Calendar', 'Cemetery', 'Consensus', 'Liaison', 'Weird', 'Rhythm', 'Vacuum', 'Miniature', 'Pharaoh',
+           'Sacrilegious', 'Restaurant', 'Supersede', 'Harass', 'Privilege', 'Maintenance', 'Bureaucracy', 'Mnemonic', 'Fuchsia', 'Ukulele', 'Minuscule', 'Inoculate', 'Desiccate', 'Bellwether', 'Daiquiri', 'Onomatopoeia'] },
+    { id: 'japanese', pool: 'words', words: true, x: 'tongues', q: 'a word English took from Japanese', yn: 'From Japanese.', nn: 'Not from Japanese.',
+      yes: [['Tycoon', 'From taikun, a title for the shogun.'], ['Honcho', 'From hanchō, a squad leader.'], ['Skosh', 'From sukoshi, a little.'], ['Emoji', 'Picture plus character. Nothing to do with emotion.'],
+            ['Karaoke', 'Empty orchestra.'], ['Tsunami', 'Harbour wave.'], ['Rickshaw', 'From jinrikisha.'], ['Soy', 'From shōyu.'], ['Bokeh', 'The blur in a photo.'], ['Kudzu', 'The vine.'], ['Ginkgo', 'The tree.'],
+            'Futon', 'Origami', 'Haiku', 'Sudoku', 'Ninja', 'Karate', 'Umami', 'Sushi', 'Bonsai', 'Kimono', 'Samurai', 'Anime', 'Manga', 'Koi', 'Panko', 'Edamame', 'Kamikaze'],
+      no: [['Ketchup', 'Probably from Hokkien Chinese, by way of Malay.'], ['Kowtow', 'Chinese.'], ['Gung-ho', 'Chinese.'], ['Feng shui', 'Chinese.'], ['Kung fu', 'Chinese.'], ['Tai chi', 'Chinese.'], ['Wok', 'Cantonese.'],
+           ['Dim sum', 'Cantonese.'], ['Lychee', 'Chinese.'], ['Kimchi', 'Korean.'], ['Taekwondo', 'Korean.'], ['Shampoo', 'Hindi.'], ['Bandana', 'Hindi.'], ['Bungalow', 'Hindi.'], ['Pajamas', 'Hindi and Urdu.'],
+           ['Juggernaut', 'Sanskrit.'], ['Guru', 'Sanskrit.'], ['Karma', 'Sanskrit.'], ['Avatar', 'Sanskrit.'], ['Boondocks', 'Tagalog.'], ['Amok', 'Malay.'], ['Orangutan', 'Malay.'], ['Ukulele', 'Hawaiian.'], ['Wiki', 'Hawaiian.'],
+           ['Taboo', 'Tongan.'], ['Tattoo', 'Polynesian.'], ['Kayak', 'Inuit.'], ['Kiwi', 'Māori.'], ['Pho', 'Vietnamese.'], ['Sriracha', 'Thai.']] },
+    { id: 'latin', pool: 'words', words: true, x: 'tongues', q: 'a Latin phrase', yn: 'Latin.', nn: 'Not Latin.',
+      yes: ['Carpe diem', 'Et cetera', 'Ad hoc', 'Quid pro quo', 'Status quo', 'Vice versa', 'Per se', 'Bona fide', 'De facto', 'Alma mater', 'Ad nauseam', 'Mea culpa', 'Persona non grata', 'Habeas corpus', 'In vitro',
+            'Pro bono', 'Caveat emptor', 'Veni, vidi, vici', 'E pluribus unum', 'Semper fidelis', 'Tabula rasa', 'Non sequitur', 'Magnum opus', 'Ipso facto', 'Sine qua non', 'Alter ego', 'Modus operandi', 'Terra firma', 'Cui bono'],
+      no: [['Eureka', 'Greek.'], ['Hoi polloi', 'Greek.'], ['Kudos', 'Greek.'], ['Kyrie eleison', 'Greek, even in the Latin Mass.'], ['Hapax legomenon', 'Greek.'], ['Faux pas', 'French.'], ['Déjà vu', 'French.'],
+           ['Raison d\'être', 'French.'], ['Carte blanche', 'French.'], ['Je ne sais quoi', 'French.'], ['Coup de grâce', 'French.'], ['Nom de plume', 'French.'], ['En masse', 'French.'], ['C\'est la vie', 'French.'],
+           ['Al fresco', 'Italian.'], ['Al dente', 'Italian.'], ['Prima donna', 'Italian.'], ['La dolce vita', 'Italian.'], ['Mano a mano', 'Spanish. It means hand to hand.'], ['Schadenfreude', 'German.'], ['Zeitgeist', 'German.'],
+           ['Hakuna matata', 'Swahili.'], ['Hocus pocus', 'Mock Latin.'], ['Lorem ipsum', 'Garbled Latin: a mangled bit of Cicero.'], ['Abracadabra', 'Nobody knows, but not Latin.'], ['Mazel tov', 'Hebrew, by way of Yiddish.']] },
+    { id: 'landlocked', pool: 'words', words: true, x: 'mapwords', q: 'a landlocked country', yn: 'No coast at all.', nn: 'It has a coast.',
+      yes: [['Liechtenstein', 'Doubly landlocked: every neighbour is landlocked too.'], ['Uzbekistan', 'Doubly landlocked: every neighbour is landlocked too.'], ['Ethiopia', 'Since Eritrea left with the coast in 1993.'],
+            ['Bolivia', 'It lost its coast to Chile in the 1880s, and still keeps a navy.'], 'Switzerland', 'Austria', 'Paraguay', 'Mongolia', 'Nepal', 'Afghanistan', 'Chad', 'Mali', 'Niger', 'Zambia', 'Zimbabwe', 'Uganda',
+            'Rwanda', 'Hungary', 'Slovakia', 'Serbia', 'Kazakhstan', 'Laos', 'Bhutan', 'Botswana', 'Luxembourg', 'Belarus', 'Moldova', 'Armenia', 'Kyrgyzstan'],
+      no: [['Bosnia and Herzegovina', 'About twelve miles of Adriatic coast.'], ['Jordan', 'One port, Aqaba, on the Red Sea.'], ['Iraq', 'A short stretch of the Persian Gulf.'],
+           ['DR Congo', 'About 25 miles of Atlantic coast.'], ['Slovenia', 'About 29 miles of Adriatic coast.'], ['Eritrea', 'The Red Sea. It is Ethiopia that has none.'], ['Belgium', 'The North Sea.'],
+           ['Togo', 'A short coast on the Gulf of Guinea.'], ['Georgia', 'The Black Sea.'], ['Bulgaria', 'The Black Sea.'], ['Sudan', 'The Red Sea.'], ['Cambodia', 'The Gulf of Thailand.'],
+           'Uruguay', 'Ecuador', 'Guyana', 'Romania', 'Germany', 'Peru', 'Benin', 'Namibia', 'Poland', 'Croatia', 'Syria'] },
+    { id: 'borderfrance', pool: 'words', words: true, x: 'mapwords', q: 'a country that borders France', nn: 'No land border with France.',
+      yes: [['Brazil', 'French Guiana is part of France, and this is its longest border.'], ['Suriname', 'It borders French Guiana, which is part of France.'], ['Netherlands', 'On the Caribbean island of Saint Martin.'],
+            ['Monaco', 'Surrounded by it.'], ['Andorra', 'In the Pyrenees.'], 'Spain', 'Italy', 'Switzerland', 'Germany', 'Belgium', 'Luxembourg'],
+      no: [['United Kingdom', 'A tunnel, but no land border.'], ['Guyana', 'It borders Suriname, not French Guiana.'], ['Canada', 'Near Saint-Pierre and Miquelon, but only by sea.'], ['Portugal', 'Spain is in the way.'],
+           ['Austria', 'Switzerland and Liechtenstein are in the way.'], ['Liechtenstein', 'Switzerland is in the way.'], ['San Marino', 'Inside Italy.'], ['Venezuela', 'Two countries west of French Guiana.'],
+           'Ireland', 'Denmark', 'Morocco', 'Algeria', 'Slovenia', 'Poland', 'Greece', 'Croatia', 'Tunisia', 'Malta', 'Norway', 'Hungary'] },
+    { id: 'island', pool: 'words', words: true, x: 'mapwords', q: 'an island country', yn: 'An island country.', nn: 'Not an island country.',
+      yes: ['Japan', 'Iceland', 'Madagascar', 'Sri Lanka', 'Cuba', 'Jamaica', 'New Zealand', 'Philippines', 'Indonesia', 'Fiji', 'Malta', 'Cyprus', 'Bahrain', 'Singapore', 'Mauritius', 'Maldives', 'Seychelles', 'Bahamas',
+            'Barbados', ['Haiti', 'It shares an island, but has no mainland.'], ['Ireland', 'It shares an island, but has no mainland.'], ['Papua New Guinea', 'It shares an island, but has no mainland.']],
+      no: [['Greenland', 'An island, but part of the Kingdom of Denmark.'], ['Hawaii', 'A state.'], ['Puerto Rico', 'A U.S. territory.'], ['Bermuda', 'A British territory.'], ['Guam', 'A U.S. territory.'],
+           ['Sicily', 'Part of Italy.'], ['Tasmania', 'Part of Australia.'], ['Corsica', 'Part of France.'], ['Crete', 'Part of Greece.'], ['Bali', 'Part of Indonesia.'], ['Zanzibar', 'Part of Tanzania.'],
+           ['Tahiti', 'Part of French Polynesia.'], ['Malaysia', 'Half of it is on the Asian mainland.'], ['Denmark', 'Mostly islands, but Jutland is mainland.'], ['Qatar', 'A peninsula.'], ['South Korea', 'A peninsula.'],
+           ['Italy', 'A peninsula.'], ['Florida', 'A peninsula, and a state.'], 'Greece', 'Belize', 'Portugal', 'Norway', 'Panama', 'Monaco'] },
+    { id: 'norepeat', pool: 'words', words: true, x: 'letters', q: 'a word with no repeated letters', yn: 'Every letter once.',
+      yes: [['Uncopyrightable', 'Fifteen letters, none twice. About as long as these get.'], ['Dermatoglyphics', 'Fifteen letters, none twice. It is the study of fingerprints.'], 'Ambidextrously', 'Background', 'Blacksmith', 'Lumberjack', 'Pathfinder', 'Trampoline', ['Duplicates', 'No duplicates in it.'], 'Flowchart', 'Nightmare', 'Copyright', 'Workmanship', 'Dumbwaiter', 'Hydroplane', 'Playground', 'Binoculars', 'Bankruptcy', 'Formidable', 'Campground', 'Artichokes', 'Documentary', 'Thunderclap', 'Switzerland', 'Misfortune', 'Harlequins', 'Juxtaposed', 'Outlandish', 'Volkswagen', 'Upholstery'],
+      no: [['Brooklyn', 'Two Os.'], ['Nonrepeating', 'Three Ns.'], ['Individual', 'Three Is.'], ['Unrepeated', 'Three Es.'], ['Originality', 'Three Is.'], ['Alphabet', 'Two As.'], ['Dictionary', 'Two Is.'], ['Vocabulary', 'Two As.'], ['Typewriter', 'Two Ts.'], ['Bookkeeper', 'Three Es.'], ['Mississippi', 'Four Is.'], ['Committee', 'Two Ms.'], ['Unique', 'Two Us.'], ['Different', 'Two Fs.'], ['Assorted', 'Two Ss.'], ['Distinct', 'Two Is.'], ['Wavelength', 'Two Es.'], ['Daybreak', 'Two As.'], ['Mosquitoes', 'Two Os.'], ['Singularity', 'Two Is.'], ['Separately', 'Two Es.'], ['Xylophone', 'Two Os.'], ['Rhythmic', 'Two Hs.'], ['Quizzical', 'Two Is.'], ['Pineapple', 'Three Ps.'], ['Crossword', 'Two Rs.']] },
+    { id: 'seven', pool: 'words', words: true, num: true, x: 'sums', q: 'a number divisible by 7',
+      yes: [['84', '7 × 12.'], ['91', '7 × 13.'], ['98', '7 × 14.'], ['105', '7 × 15.'], ['112', '7 × 16.'], ['119', '7 × 17.'], ['126', '7 × 18.'], ['133', '7 × 19.'], ['147', '7 × 21.'], ['154', '7 × 22.'], ['161', '7 × 23.'], ['168', '7 × 24.'], ['182', '7 × 26.'], ['196', '7 × 28.'], ['203', '7 × 29.'], ['217', '7 × 31.'], ['231', '7 × 33.'], ['259', '7 × 37.'], ['273', '7 × 39.'], ['301', '7 × 43.']],
+      no: [['83', '7 × 11 is 77. 6 left over.'], ['86', '7 × 12 is 84. 2 left over.'], ['93', '7 × 13 is 91. 2 left over.'], ['96', '7 × 13 is 91. 5 left over.'], ['97', '7 × 13 is 91. 6 left over.'], ['102', '7 × 14 is 98. 4 left over.'], ['107', '7 × 15 is 105. 2 left over.'], ['111', '7 × 15 is 105. 6 left over.'], ['114', '7 × 16 is 112. 2 left over.'], ['121', '7 × 17 is 119. 2 left over.'], ['127', '7 × 18 is 126. 1 left over.'], ['134', '7 × 19 is 133. 1 left over.'], ['141', '7 × 20 is 140. 1 left over.'], ['143', '7 × 20 is 140. 3 left over.'], ['153', '7 × 21 is 147. 6 left over.'], ['157', '7 × 22 is 154. 3 left over.'], ['162', '7 × 23 is 161. 1 left over.'], ['171', '7 × 24 is 168. 3 left over.'], ['177', '7 × 25 is 175. 2 left over.'], ['183', '7 × 26 is 182. 1 left over.'], ['187', '7 × 26 is 182. 5 left over.'], ['193', '7 × 27 is 189. 4 left over.'], ['201', '7 × 28 is 196. 5 left over.'], ['207', '7 × 29 is 203. 4 left over.'], ['211', '7 × 30 is 210. 1 left over.'], ['221', '7 × 31 is 217. 4 left over.'], ['227', '7 × 32 is 224. 3 left over.'], ['237', '7 × 33 is 231. 6 left over.'], ['247', '7 × 35 is 245. 2 left over.'], ['253', '7 × 36 is 252. 1 left over.'], ['267', '7 × 38 is 266. 1 left over.'], ['271', '7 × 38 is 266. 5 left over.'], ['289', '7 × 41 is 287. 2 left over.'], ['299', '7 × 42 is 294. 5 left over.']] },
+    { id: 'half', pool: 'words', words: true, num: true, x: 'sums', q: 'a fraction bigger than a half',
+      yes: [['3/5', 'Half of 5 is 2.5, and 3 is more.'], ['5/8', 'Half of 8 is 4, and 5 is more.'], ['4/7', 'Half of 7 is 3.5, and 4 is more.'], ['5/9', 'Half of 9 is 4.5, and 5 is more.'], ['6/11', 'Half of 11 is 5.5, and 6 is more.'], ['7/12', 'Half of 12 is 6, and 7 is more.'], ['7/13', 'Half of 13 is 6.5, and 7 is more.'], ['8/15', 'Half of 15 is 7.5, and 8 is more.'], ['9/16', 'Half of 16 is 8, and 9 is more.'], ['9/17', 'Half of 17 is 8.5, and 9 is more.'], ['10/19', 'Half of 19 is 9.5, and 10 is more.'], ['11/20', 'Half of 20 is 10, and 11 is more.'], ['11/21', 'Half of 21 is 10.5, and 11 is more.'], ['12/23', 'Half of 23 is 11.5, and 12 is more.'], ['13/24', 'Half of 24 is 12, and 13 is more.'], ['13/25', 'Half of 25 is 12.5, and 13 is more.'], ['2/3', 'Half of 3 is 1.5, and 2 is more.'], ['51/100', 'Half of 100 is 50, and 51 is more.']],
+      no: [['1/2', 'Exactly a half. Not bigger.'], ['3/6', 'Exactly a half. Not bigger.'], ['50/100', 'Exactly a half. Not bigger.'], ['3/7', 'Half of 7 is 3.5, and 3 is less.'], ['4/9', 'Half of 9 is 4.5, and 4 is less.'], ['5/11', 'Half of 11 is 5.5, and 5 is less.'], ['5/12', 'Half of 12 is 6, and 5 is less.'], ['6/13', 'Half of 13 is 6.5, and 6 is less.'], ['7/15', 'Half of 15 is 7.5, and 7 is less.'], ['7/16', 'Half of 16 is 8, and 7 is less.'], ['8/17', 'Half of 17 is 8.5, and 8 is less.'], ['9/19', 'Half of 19 is 9.5, and 9 is less.'], ['9/20', 'Half of 20 is 10, and 9 is less.'], ['10/21', 'Half of 21 is 10.5, and 10 is less.'], ['11/23', 'Half of 23 is 11.5, and 11 is less.'], ['11/24', 'Half of 24 is 12, and 11 is less.'], ['12/25', 'Half of 25 is 12.5, and 12 is less.'], ['3/8', 'Half of 8 is 4, and 3 is less.'], ['2/5', 'Half of 5 is 2.5, and 2 is less.'], ['49/100', 'Half of 100 is 50, and 49 is less.']] },
+    { id: 'roman', pool: 'words', words: true, num: true, x: 'sums', q: 'a Roman numeral bigger than 100',
+      yes: [['CI', '101.'], ['CIV', '104.'], ['CIX', '109.'], ['CXI', '111.'], ['CXL', '140.'], ['CXC', '190.'], ['CC', '200.'], ['CCL', '250.'], ['CD', '400.'], ['D', '500.'], ['DC', '600.'], ['CM', '900.'], ['M', '1,000.'], ['MC', '1,100.'], ['MCM', '1,900.'], ['MM', '2,000.'], ['CL', '150.'], ['CLX', '160.'], ['DL', '550.']],
+      no: [['C', 'Exactly 100. Not bigger.'], ['XCIX', '99.'], ['XC', '90.'], ['XCV', '95.'], ['XCVIII', '98.'], ['LXXXIX', '89.'], ['LXXX', '80.'], ['LX', '60.'], ['L', '50.'], ['XL', '40.'], ['XLIX', '49.'], ['LIX', '59.'], ['LXIV', '64.'], ['LXXVII', '77.'], ['XIX', '19.'], ['XXX', '30.'], ['IX', '9.'], ['VIII', '8.'], ['LXXXVIII', '88.'], ['XCIV', '94.']] },
+    // ---- memory: nothing to know, only what has already gone by. Their slides are generated (genRound).
+    { id: 'repeat', pool: 'memory', gen: 'repeat', q: 'a picture you have already seen this round', yes: [], no: [] },
+    { id: 'alpha', pool: 'memory', gen: 'alpha', words: true, q: 'the first word out of alphabetical order', yes: [], no: [] },
+    { id: 'drop', pool: 'memory', gen: 'drop', words: true, num: true, q: 'a number smaller than the one before it', yes: [], no: [] },
     { id: 'prime', pool: 'words', words: true, num: true, q: 'a prime number', yn: 'Divisible by 1 and itself, and nothing else.',
       yes: [53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149].map(String),
       no: [1, 9, 15, 21, 25, 27, 33, 35, 39, 45, 49, 51, 55, 57, 63, 65, 69, 75, 77, 81, 85, 87, 91, 93, 95, 99, 111, 117, 119, 121, 123, 129, 133, 141, 143, 147, 153, 161, 169, 187].map(String) }
@@ -1290,12 +1473,12 @@ p{margin:0}
 
   // ───────────── picking a game: ten reels, a few from each shelf, no two alike ─────────────
   const reelById = (id) => REELS.find(r => r.id === id);
-  const usable = (r) => r.yes.some(s => !state.bad[s.k]);
+  const usable = (r) => !!r.gen || r.yes.some(s => !state.bad[s.k]);
   function pickPlan() {
     const want = MIX[mix], out = [], groups = {};
     for (const pool of Object.keys(want)) {
       let n = want[pool];
-      for (const r of shuffle(REELS.filter(r => r.pool === pool && usable(r)))) {
+      for (const r of shuffle(REELS.filter(r => r.pool === pool && usable(r) && !(mix === 'photos' && r.words)))) {
         if (!n) break;
         if (r.x && groups[r.x]) continue;
         if (r.x) groups[r.x] = true;
@@ -1317,9 +1500,47 @@ p{margin:0}
     }
     return best.slice(0, ROUNDS);
   }
+  // The memory reels have no fixed slides. Each round is made up on the spot, and the right slide is right
+  // only because of what came before it, so it is never the first one up.
+  const ABC = 'Acorn Anchor Apple Arrow Badge Bagel Banjo Basket Beach Bottle Bridge Bubble Cabin Camel Candle Carrot Castle Cherry Cloud Comet Cookie Dagger Daisy Desert Dolphin Donkey Dragon Eagle Elbow Engine Fabric Falcon Feather Fiddle Forest Fossil Garden Garlic Ghost Giraffe Goblin Guitar Hammer Harbor Helmet Honey Hornet Igloo Island Ivory Jacket Jaguar Jelly Jungle Kettle Kitten Ladder Lantern Lemon Lizard Magnet Maple Marble Meadow Mitten Napkin Needle Noodle Oboe Ocean Olive Orchid Otter Paddle Parrot Pebble Pencil Pickle Pillow Quarry Quiver Rabbit Radish Ribbon Rocket Saddle Sailor Salmon Shadow Spider Table Thimble Ticket Tiger Tunnel Turtle Umbrella Uncle Valley Velvet Violin Wagon Walnut Whistle Window Yacht Yogurt Zebra Zipper'.split(' ');
+  function genRound(reel) {
+    const interval = PACES[pace];
+    const maxK = Math.max(2, Math.floor(MAX_WAIT / interval));
+    const k = 2 + Math.floor(Math.random() * (maxK - 1));          // two to maxK slides before the one to tap
+    const pick = (n) => 1 + Math.floor(Math.random() * n);
+    let seq = [];
+    if (reel.gen === 'repeat') {
+      const ids = shuffle(Object.keys(NAMES).filter(id => !state.bad[id])).slice(0, k + 1);
+      const from = Math.floor(Math.random() * (k - 1));              // not the slide just gone: that would be too easy
+      seq = ids.slice(0, k).map(id => ({ k: id, t: NAMES[id], n: 'That was its first time up.', img: true }));
+      seq.push({ k: ids[from], t: NAMES[ids[from]], n: 'It was slide no. ' + (from + 1) + ' as well.', img: true });
+      seq.push({ k: ids[k], t: NAMES[ids[k]], n: 'That was its first time up.', img: true });
+    } else if (reel.gen === 'alpha') {
+      const at = shuffle(ABC.map((w, i) => i).slice(3, -2)).slice(0, k).sort((a, b) => a - b);   // k words in order, leaving room below the first few
+      const used = new Set(at), last = at[k - 1], floor = at[k - 2];
+      let t = last - 1; while (t > floor && used.has(t)) t--;        // just before the last word if it can be, so it is a near miss
+      if (t <= floor || used.has(t)) { t = floor - 1; while (t >= 0 && used.has(t)) t--; }
+      if (t < 0) t = 0;
+      seq = at.map((i, n) => ({ k: ABC[i], t: ABC[i], n: n ? 'Still in order: it comes after ' + ABC[at[n - 1]] + '.' : 'The first word. Nothing to be out of order with.', img: false }));
+      seq.push({ k: ABC[t], t: ABC[t], n: 'It comes before ' + ABC[last] + ', the word ahead of it.', img: false });
+      let after = t + 1; while (after < ABC.length - 1 && (used.has(after) || after === t)) after++;
+      seq.push({ k: ABC[after], t: ABC[after], n: 'Back in order: it comes after ' + ABC[t] + '.', img: false });
+    } else {
+      let v = 4 + pick(40); const vals = [];
+      for (let i = 0; i < k; i++) { vals.push(v); v += pick(i % 3 === 2 ? 90 : 35); }
+      const last = vals[k - 1]; let down = Math.max(1, last - pick(Math.min(25, last - 1)));
+      while (down > 1 && vals.includes(down)) down--;
+      if (vals.includes(down)) { down = last - 1; while (vals.includes(down)) down--; }
+      seq = vals.map((x, n) => ({ k: String(x), t: String(x), n: n ? 'Up from ' + vals[n - 1] + '.' : 'The first number. Nothing to be smaller than.', img: false }));
+      seq.push({ k: String(down), t: String(down), n: 'Down from ' + last + '.', img: false });
+      const up = String(last + pick(30)); seq.push({ k: up, t: up, n: 'Up again.', img: false });
+    }
+    return { reel, interval, k, target: seq[k], seq };
+  }
   // One round: which slide is the right one, how many wrong ones come first, and which.
   // The wait is drawn evenly from zero to MAX_WAIT seconds, so the right slide is sometimes the first one up.
   function buildRound(reel) {
+    if (reel.gen) return genRound(reel);
     const interval = PACES[pace];
     const fresh = (list) => shuffle(list.filter(s => !state.bad[s.k])).sort((a, b) => (state.shown[a.k] || 0) - (state.shown[b.k] || 0));   // least seen this game first
     const target = fresh(reel.yes)[0];
@@ -1355,7 +1576,7 @@ p{margin:0}
   }
   function warmNext() {                                   // while people argue over the last round, fetch a likely next one
     const next = reelById(state.plan[state.round]);
-    if (next && !next.words) { try { buildRound(next).seq.forEach(s => loadOne(s.k)); } catch (e) { /* fine */ } }
+    if (next && !next.words && !next.gen) { try { buildRound(next).seq.forEach(s => loadOne(s.k)); } catch (e) { /* fine */ } }
   }
 
   // ───────────── game flow ─────────────
