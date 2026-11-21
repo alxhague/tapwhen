@@ -121,6 +121,7 @@ p{margin:0}
 .win{position:relative;aspect-ratio:3/2;border-radius:9px;overflow:hidden;background:#0c0b0a;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
 #slide,#slide>*,.leader{position:absolute;inset:0;width:100%;height:100%}
 #slide img{display:block;object-fit:cover;pointer-events:none;-webkit-user-drag:none}
+#slide .draw svg{display:block;width:100%;height:100%}
 .clack{animation:clack .16s linear}
 @keyframes clack{0%{filter:brightness(.15);transform:translateY(-2.5%)}45%{filter:brightness(.7);transform:translateY(.6%)}100%{filter:none;transform:none}}
 /* a title slide: type on paper, for rounds that are names or numbers */
@@ -454,7 +455,7 @@ p{margin:0}
       <div class="group">
         <div class="eyebrow">Rounds</div>
         <div class="opts">
-          <button class="opt" id="mixAll" type="button"><span class="t">Photos and words</span><span class="d">Six photo rounds, three of names or numbers, and one memory round.</span></button>
+          <button class="opt" id="mixAll" type="button"><span class="t">Photos and words</span><span class="d">Six photo rounds, three of names or numbers, and one memory or counting round.</span></button>
           <button class="opt" id="mixPhotos" type="button"><span class="t">Photos only</span><span class="d">Animals, landmarks, art, space and flags.</span></button>
         </div>
       </div>
@@ -1187,7 +1188,17 @@ p{margin:0}
     { id: 'roman', pool: 'words', words: true, num: true, x: 'sums', q: 'a Roman numeral bigger than 100',
       yes: [['CI', '101.'], ['CIV', '104.'], ['CIX', '109.'], ['CXI', '111.'], ['CXL', '140.'], ['CXC', '190.'], ['CC', '200.'], ['CCL', '250.'], ['CD', '400.'], ['D', '500.'], ['DC', '600.'], ['CM', '900.'], ['M', '1,000.'], ['MC', '1,100.'], ['MCM', '1,900.'], ['MM', '2,000.'], ['CL', '150.'], ['CLX', '160.'], ['DL', '550.']],
       no: [['C', 'Exactly 100. Not bigger.'], ['XCIX', '99.'], ['XC', '90.'], ['XCV', '95.'], ['XCVIII', '98.'], ['LXXXIX', '89.'], ['LXXX', '80.'], ['LX', '60.'], ['L', '50.'], ['XL', '40.'], ['XLIX', '49.'], ['LIX', '59.'], ['LXIV', '64.'], ['LXXVII', '77.'], ['XIX', '19.'], ['XXX', '30.'], ['IX', '9.'], ['VIII', '8.'], ['LXXXVIII', '88.'], ['XCIV', '94.']] },
+    { id: 'pod', pool: 'words', words: true, x: 'groups', q: 'an animal whose group is called a pod', yn: 'A pod.',
+      yes: ['Dolphins', 'Whales', 'Orcas', 'Porpoises', 'Narwhals', 'Seals', 'Pelicans'],
+      no: [['Sharks', 'A shiver.'], ['Fish', 'A school.'], ['Jellyfish', 'A smack.'], ['Otters', 'A raft.'], ['Penguins', 'A colony, or a waddle.'], ['Crabs', 'A cast.'], ['Ducks', 'A raft, on the water.'], ['Geese', 'A gaggle.'], ['Turtles', 'A bale.'], ['Crocodiles', 'A bask.'], ['Frogs', 'An army.'], ['Stingrays', 'A fever.'], ['Oysters', 'A bed.'], ['Swans', 'A bevy.'], ['Flamingos', 'A flamboyance.'], ['Trout', 'A hover.'], ['Salmon', 'A run.'], ['Barracudas', 'A battery.'], ['Lions', 'A pride.'], ['Wolves', 'A pack.'], ['Bees', 'A swarm.'], ['Crows', 'A murder.']] },
+    { id: 'pack', pool: 'words', words: true, x: 'groups', q: 'an animal whose group is called a pack',
+      yes: [['Wolves', 'The original pack.'], ['Dogs', 'A pack.'], ['African wild dogs', 'A pack.'], ['Coyotes', 'A pack, or a band.'], ['Dingoes', 'A pack.'], ['Jackals', 'A pack.']],
+      no: [['Lions', 'A pride.'], ['Hyenas', 'A clan, or a cackle.'], ['Foxes', 'A skulk.'], ['Tigers', 'An ambush.'], ['Bears', 'A sleuth.'], ['Cats', 'A clowder.'], ['Meerkats', 'A mob.'], ['Lemurs', 'A conspiracy.'], ['Ferrets', 'A business.'], ['Leopards', 'A leap.'], ['Cheetahs', 'A coalition.'], ['Badgers', 'A cete.'], ['Kangaroos', 'A mob.'], ['Gorillas', 'A troop.'], ['Baboons', 'A troop.'], ['Elephants', 'A herd.'], ['Crows', 'A murder.'], ['Camels', 'A caravan.'], ['Dolphins', 'A pod.'], ['Sheep', 'A flock.'], ['Rhinos', 'A crash.'], ['Owls', 'A parliament.']] },
+    { id: 'groupname', pool: 'words', words: true, x: 'groups', q: 'a real name for a group of animals', yn: 'A real one.',
+      yes: ['A murder of crows', 'A parliament of owls', 'A crash of rhinos', 'A tower of giraffes', 'A dazzle of zebras', 'An unkindness of ravens', 'A flamboyance of flamingos', 'A business of ferrets', 'A prickle of porcupines', 'A bloat of hippos', 'An exaltation of larks', 'A conspiracy of lemurs', 'A raft of otters', 'A shrewdness of apes', 'A murmuration of starlings', 'A smack of jellyfish', 'A gaggle of geese', 'An ambush of tigers', 'A leap of leopards', 'A wisdom of wombats', 'A skulk of foxes', 'A pandemonium of parrots', 'A caravan of camels', 'A mob of kangaroos', 'A cackle of hyenas', 'A convocation of eagles', 'A knot of toads', 'An army of frogs', 'A shiver of sharks', 'An embarrassment of pandas', 'A kaleidoscope of butterflies', 'A sleuth of bears', 'A clowder of cats', 'A fever of stingrays'],
+      no: [['A murder of ravens', 'That is an unkindness. Crows get the murder.'], ['A parliament of crows', 'That is a murder. Owls get the parliament.'], ['A crash of hippos', 'That is a bloat. Rhinos get the crash.'], ['A tower of zebras', 'That is a dazzle. Giraffes get the tower.'], ['A dazzle of flamingos', 'That is a flamboyance. Zebras get the dazzle.'], ['A pride of tigers', 'That is an ambush. Lions get the pride.'], ['A flamboyance of parrots', 'That is a pandemonium. Flamingos get the flamboyance.'], ['A smack of sharks', 'That is a shiver. Jellyfish get the smack.'], ['A shiver of jellyfish', 'That is a smack. Sharks get the shiver.'], ['A raft of frogs', 'That is an army. Otters get the raft.'], ['A caravan of kangaroos', 'That is a mob. Camels get the caravan.'], ['A mob of camels', 'That is a caravan. Kangaroos get the mob.'], ['A cackle of geese', 'That is a gaggle. Hyenas get the cackle.'], ['A gaggle of hyenas', 'That is a cackle. Geese get the gaggle.'], ['An exaltation of eagles', 'That is a convocation. Larks get the exaltation.'], ['A convocation of larks', 'That is an exaltation. Eagles get the convocation.'], ['A skulk of bears', 'That is a sleuth. Foxes get the skulk.'], ['A sleuth of foxes', 'That is a skulk. Bears get the sleuth.'], ['A business of lemurs', 'That is a conspiracy. Ferrets get the business.'], ['A conspiracy of ferrets', 'That is a business. Lemurs get the conspiracy.'], ['A wisdom of owls', 'That is a parliament. Wombats get the wisdom.'], ['A bloat of rhinos', 'That is a crash. Hippos get the bloat.'], ['A knot of frogs', 'That is an army. Toads get the knot.'], ['A clowder of leopards', 'That is a leap. Cats get the clowder.']] },
     // ---- memory: nothing to know, only what has already gone by. Their slides are generated (genRound).
+    { id: 'hundred', pool: 'memory', gen: 'count', q: 'at least 100 of something', yes: [], no: [] },
     { id: 'repeat', pool: 'memory', gen: 'repeat', q: 'a picture you have already seen this round', yes: [], no: [] },
     { id: 'alpha', pool: 'memory', gen: 'alpha', words: true, q: 'the first word out of alphabetical order', yes: [], no: [] },
     { id: 'drop', pool: 'memory', gen: 'drop', words: true, num: true, q: 'a number smaller than the one before it', yes: [], no: [] },
@@ -1503,7 +1514,50 @@ p{margin:0}
   // The memory reels have no fixed slides. Each round is made up on the spot, and the right slide is right
   // only because of what came before it, so it is never the first one up.
   const ABC = 'Acorn Anchor Apple Arrow Badge Bagel Banjo Basket Beach Bottle Bridge Bubble Cabin Camel Candle Carrot Castle Cherry Cloud Comet Cookie Dagger Daisy Desert Dolphin Donkey Dragon Eagle Elbow Engine Fabric Falcon Feather Fiddle Forest Fossil Garden Garlic Ghost Giraffe Goblin Guitar Hammer Harbor Helmet Honey Hornet Igloo Island Ivory Jacket Jaguar Jelly Jungle Kettle Kitten Ladder Lantern Lemon Lizard Magnet Maple Marble Meadow Mitten Napkin Needle Noodle Oboe Ocean Olive Orchid Otter Paddle Parrot Pebble Pencil Pickle Pillow Quarry Quiver Rabbit Radish Ribbon Rocket Saddle Sailor Salmon Shadow Spider Table Thimble Ticket Tiger Tunnel Turtle Umbrella Uncle Valley Velvet Violin Wagon Walnut Whistle Window Yacht Yogurt Zebra Zipper'.split(' ');
+  // The counting reel draws its own slides: one kind of thing, scattered, and the question is only how many.
+  // Sizes vary from slide to slide, so a full-looking frame is not always a hundred.
+  const THINGS = [
+    { name: 'jellybeans', bg: '#f3ead6', cols: ['#e2412f', '#f2a41c', '#3f9b4b', '#3b6fd1', '#8b4bb8', '#ef7fae', '#f4d21f'], draw: (r, c) => `<ellipse rx="${r}" ry="${r * .6}" fill="${c}"/><ellipse cx="${-r * .35}" cy="${-r * .22}" rx="${r * .28}" ry="${r * .1}" fill="#fff" opacity=".55"/>` },
+    { name: 'marbles', bg: '#2f5d47', cols: ['#e9e4d4', '#d94d3a', '#3d7fd6', '#f0b62b', '#7fd1c4', '#b87fe0'], draw: (r, c) => `<circle r="${r * .8}" fill="${c}"/><circle cx="${-r * .28}" cy="${-r * .28}" r="${r * .2}" fill="#fff" opacity=".6"/>` },
+    { name: 'fish', bg: '#1f5f86', cols: ['#f28a2e', '#f6c544', '#e86a5c', '#9fd6e8', '#c9d2d6'], draw: (r, c) => `<path d="M${r * .7} 0 L${r * 1.15} ${-r * .45} L${r * 1.15} ${r * .45} Z" fill="${c}"/><ellipse rx="${r * .8}" ry="${r * .45}" fill="${c}"/><circle cx="${-r * .45}" cy="${-r * .1}" r="${r * .09}" fill="#111"/>`, flat: true },
+    { name: 'sheep', bg: '#7fae58', cols: ['#fbf7ee'], draw: (r, c) => `<path d="M${-r * .35} ${r * .3} v${r * .5} M${r * .3} ${r * .3} v${r * .5}" stroke="#2a241f" stroke-width="${r * .14}"/><circle cx="${-r * .35}" r="${r * .42}" fill="${c}"/><circle cx="${r * .3}" r="${r * .42}" fill="${c}"/><circle cy="${-r * .28}" r="${r * .45}" fill="${c}"/><circle cy="${r * .2}" r="${r * .42}" fill="${c}"/><ellipse cx="${-r * .78}" cy="${-r * .05}" rx="${r * .26}" ry="${r * .2}" fill="#2a241f"/>`, flat: true },
+    { name: 'ladybirds', bg: '#b9d48a', cols: ['#d8301f'], draw: (r, c) => `<circle cx="${-r * .62}" r="${r * .3}" fill="#151210"/><circle r="${r * .62}" fill="${c}"/><path d="M${-r * .62} 0 H${r * .62}" stroke="#151210" stroke-width="${r * .08}"/><circle cx="${-r * .15}" cy="${-r * .28}" r="${r * .11}" fill="#151210"/><circle cx="${r * .25}" cy="${-r * .3}" r="${r * .11}" fill="#151210"/><circle cx="${-r * .1}" cy="${r * .3}" r="${r * .11}" fill="#151210"/><circle cx="${r * .3}" cy="${r * .28}" r="${r * .11}" fill="#151210"/>` },
+    { name: 'stars', bg: '#131a33', cols: ['#f7e08a', '#fff4c9', '#f4c95d'], draw: (r, c) => `<path d="M0 ${-r * .9} L${r * .26} ${-r * .3} L${r * .88} ${-r * .28} L${r * .4} ${r * .14} L${r * .55} ${r * .78} L0 ${r * .42} L${-r * .55} ${r * .78} L${-r * .4} ${r * .14} L${-r * .88} ${-r * .28} L${-r * .26} ${-r * .3} Z" fill="${c}"/>` },
+    { name: 'penguins', bg: '#dfeef5', cols: ['#20242b'], draw: (r, c) => `<ellipse rx="${r * .5}" ry="${r * .85}" fill="${c}"/><ellipse cy="${r * .15}" rx="${r * .3}" ry="${r * .6}" fill="#fff"/><path d="M${-r * .1} ${-r * .5} L${r * .1} ${-r * .5} L0 ${-r * .32} Z" fill="#f08a1d"/>`, flat: true }
+  ];
+  function scatter(thing, n) {
+    const W = 900, H = 600, rmax = Math.sqrt(W * H / (n * 6.3));
+    const r = Math.max(8, Math.min(38, rmax * (0.42 + Math.random() * 0.38)));
+    const pts = [], gap = 2 * r * 0.98;
+    for (let i = 0; i < n; i++) {
+      let x = 0, y = 0;
+      for (let t = 0; t < 300; t++) {
+        x = r + Math.random() * (W - 2 * r); y = r + Math.random() * (H - 2 * r);
+        if (!pts.some(p => Math.abs(p[0] - x) < gap && Math.abs(p[1] - y) < gap && Math.hypot(p[0] - x, p[1] - y) < gap)) break;
+      }
+      pts.push([x, y]);
+    }
+    const f = (v) => Math.round(v * 10) / 10;
+    const items = pts.map(([x, y]) => {
+      const c = thing.cols[Math.floor(Math.random() * thing.cols.length)];
+      const turn = thing.flat ? (Math.random() < .5 ? 'scale(-1,1)' : '') : `rotate(${Math.floor(Math.random() * 360)})`;
+      return `<g class="i" transform="translate(${f(x)} ${f(y)}) ${turn}">${thing.draw(f(r), c)}</g>`;
+    }).join('');
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice"><rect width="${W}" height="${H}" fill="${thing.bg}"/>${items}</svg>`;
+  }
+  function countRound(reel) {
+    const interval = PACES[pace], maxK = Math.floor(MAX_WAIT / interval);
+    const k = Math.floor(Math.random() * (maxK + 1));
+    const things = shuffle(THINGS.slice()), seq = [];
+    for (let i = 0; i < k + 2; i++) {
+      const thing = things[i % things.length], hit = i === k;
+      const n = hit ? 115 + Math.floor(Math.random() * 100) : 12 + Math.floor(Math.random() * 72);
+      seq.push({ k: 'count-' + i, t: n + ' ' + thing.name, n: hit ? 'Comfortably over a hundred.' : 'Not a hundred.', img: false, svg: scatter(thing, n) });
+    }
+    return { reel, interval, k, target: seq[k], seq };
+  }
   function genRound(reel) {
+    if (reel.gen === 'count') return countRound(reel);
     const interval = PACES[pace];
     const maxK = Math.max(2, Math.floor(MAX_WAIT / interval));
     const k = 2 + Math.floor(Math.random() * (maxK - 1));          // two to maxK slides before the one to tap
@@ -1653,6 +1707,7 @@ p{margin:0}
     let node;
     if (!s) { node = makeCard('End of reel', 'end'); }
     else if (s.img) node = cache.get(s.k).img;
+    else if (s.svg) { node = document.createElement('div'); node.className = 'draw'; node.innerHTML = s.svg; }
     else node = makeCard(s.t, r.reel.num ? 'num' : '');
     $('slide').replaceChildren(node);
     if (node.classList.contains('card')) fitCard(node);

@@ -9,7 +9,7 @@ A party-game prototype. Each round names one thing to wait for: a carnivore, a l
 - If the right slide goes by untapped, nobody scores.
 - Ten rounds. Most points wins.
 
-There are 91 reels on seven shelves: animals, landmarks, art, space, flags, names and numbers, and memory. Each game draws ten. The three memory reels (a repeated picture, a word out of alphabetical order, a number that drops) have no fixed slides: `genRound` makes each round up, and the right slide is right only because of what came before it. Eight of them are size comparisons: bigger than Earth, a person, the Mona Lisa, Texas, a breadbox, a baseball or a million, and taller than the Statue of Liberty.
+There are 95 reels on seven shelves: animals, landmarks, art, space, flags, names and numbers, and memory. Each game draws ten. The three memory reels (a repeated picture, a word out of alphabetical order, a number that drops) have no fixed slides: `genRound` makes each round up, and the right slide is right only because of what came before it. The counting reel (at least 100 of something) sits on the same shelf and draws its own slides in `scatter`. Eight of them are size comparisons: bigger than Earth, a person, the Mona Lisa, Texas, a breadbox, a baseball or a million, and taller than the Statue of Liberty.
 
 ## Running it
 
